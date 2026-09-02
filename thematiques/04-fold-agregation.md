@@ -10,9 +10,10 @@ Filter et Map traitent chaque élément indépendamment. Fold (alias `Aggregate`
 
 ## Théorie
 
+- [Slides](../slides/04-fold/)
 - [04-Reduce](../supports/source/04-Reduce.md)
 - [PPT Reduce](../supports/source/03-Reduce.pptx)
-- [Documentation officielle LINQ](../supports/linq.pdf)
+- [Références techniques LINQ](../supports/source/references.md) — cheatsheet et documentation officielle
 - [Kahoot reduce](https://create.kahoot.it/details/ae81d53f-ebc0-40f7-afea-fdcc001e7ba8)
 
 **Particularités utiles pour les activités**

@@ -1,7 +1,8 @@
 {
+  "siteBase": "/323-Programmation_fonctionnelle/",
   "devDependencies": {
     "@braintree/sanitize-url": "^7.1.1",
-    "@slidev/cli": "0.50.0-beta.5",
+    "@slidev/cli": "^52.19.1",
     "@slidev/theme-default": "^0.25.0",
     "cytoscape": "^3.31.1",
     "cytoscape-cose-bilkent": "^4.1.0",
@@ -26,8 +27,8 @@
     "docs:preview": "vitepress preview",
     "pdf:lin": "for f in supports/*.md;       do md-to-pdf --launch-options '{\"args\": [\"--no-sandbox\"]}' --document-title \"$(basename \"${f}\" .md)\" --config-file ./.vitepress/pdf-config.js \"${f}\" ; done && cp supports/*.pdf .vitepress/dist/supports/",
     "pdf:win": "for /r %F in (supports\\*.md) do md-to-pdf                                                   --document-title \"%~nF\"                     --config-file .\\.vitepress\\pdf-config.js \"%F\"        && cp supports/*.pdf .vitepress/dist/supports/",
-    "slidev:lin": "for f in slides/*.md;       do slidev build \"${f}\" --out \"../.vitepress/dist/slides/$(basename \"${f}\" .md)\" --base \"/c-335-mobile/slides/$(basename \"${f}\" .md)/\" ; done",
-    "slidev:win": "for /r %F in (slides\\*.md) do slidev build \"%F\"   --out \"..\\.vitepress\\dist\\slides\\%~nF\"                 --base \"/c-335-mobile/slides/%~nF/\""
+    "slidev:lin": "BASE=$(node -p \"require('./package.json').siteBase\") && for f in slides/*.md; do slidev build \"${f}\" --out \"../.vitepress/dist/slides/$(basename \"${f}\" .md)\" --base \"${BASE}slides/$(basename \"${f}\" .md)/\" ; done",
+    "slidev:win": "for /f \"delims=\" %B in ('node -p \"require('./package.json').siteBase\"') do @for %%F in (slides\\*.md) do slidev build \"%%F\" --out \"..\\.vitepress\\dist\\slides\\%%~nF\" --base \"%Bslides/%%~nF/\""
   },
   "packageManager": "pnpm@9.11.0+sha512.0a203ffaed5a3f63242cd064c8fb5892366c103e328079318f78062f24ea8c9d50bc6a47aa3567cabefd824d170e78fa2745ed1f16b132e16436146b7688f19b",
   "dependencies": {

@@ -75,7 +75,7 @@ layout: section
 
 <v-clicks>
 
-```csharp {1-5}
+```csharp {1-6}
 // Action = fonction SANS valeur de retour
 // Action<A,B,...> → les paramètres entre chevrons
 void LogTo(Action<string> output)
@@ -84,7 +84,7 @@ void LogTo(Action<string> output)
 }
 ```
 
-```csharp {1-6}
+```csharp {1-7}
 // Func = fonction AVEC valeur de retour
 // Func<A,B,...,TResult> → le DERNIER type est le retour
 void Compute(int a, int b, Func<int, int, double> operation)
@@ -106,7 +106,7 @@ Compute(10, 2, (a, b) => (double)a / b); // → 5
 
 # La puissance : changer de comportement sans changer le code
 
-```csharp {1-6|8-11|13-14|all}
+```csharp {1-3|5-7|9-11|all}
 // Plusieurs implémentations du même contrat
 void ToFile(string text)    => File.AppendAllText("log.txt", text);
 void ToConsole(string text) => Console.WriteLine(text);
@@ -195,7 +195,7 @@ layout: section
 
 # Un lambda peut utiliser des variables de son entourage
 
-```csharp {1-2|4|6-7|all}
+```csharp {1|3-4|6|all}
 int minKda = 2;
 
 Func<Player, bool> isGood = p => p.Kda >= minKda; // utilise minKda
@@ -300,7 +300,7 @@ var topPlayers = players.Where(p => p.Kda > 2).ToList();
 
 # Combiner plusieurs filtres
 
-```csharp {1-2|4-5|7-10|all}
+```csharp {1-3|5-7|9-13|all}
 // Chaîner deux Where
 players.Where(p => p.Kda > 2).Where(p => p.Games > 10).ToList();
 // → [Raph]
@@ -327,7 +327,7 @@ layout: section
 
 # Where ne filtre pas immédiatement
 
-```csharp {1-3|5-7|9-10|all}
+```csharp {1-3|5|7-8|all}
 var players = new List<Player> { new("Léa", 2.4), new("Sam", 1.2) };
 
 var query = players.Where(p => p.Kda > 2); // ← RIEN n'est filtré ici
@@ -390,7 +390,7 @@ var result = query.ToList(); // ← exécution ICI
 
 # Any et All — agrégateurs booléens
 
-```csharp {1-5|7-10|all}
+```csharp {1-5|7-8|all}
 var numbers = new List<int> { 1, 2, 3, 4, 5 };
 
 bool hasEven = numbers.Any(n => n % 2 == 0); // → true  (2 et 4 existent)

@@ -4,7 +4,7 @@
 
 ## Concepts théoriques
 
-- [Thématique 02 — Filter et fonctions d'ordre supérieur](../../../thematiques/02-filter-fonctions-sup.md)
+- [Thématique 02 — Filter et fonctions d'ordre supérieur](../../../../thematiques/02-filter-fonctions-sup.md)
 - [Fonctions d'ordre supérieur](../../../../supports/source/02a-fonctions-sup.md)
 - [Filter et prédicats](../../../../supports/source/02b-filter.md)
 - [Closures](../../../../supports/source/02a-fonctions-sup.md#closures-captures-de-variables)
@@ -206,10 +206,15 @@ _ = query.Count; // Maintenant les lignes s'affichent
 Conséquence surprenante de la paresse : la source peut changer **après** la construction de la query.
 
 ```csharp
-var source = new List<double> { 1.0, 2.0, 3.0 };
+var source = new List<DataPoint<double>>
+{
+    new(new DateTime(2024, 1, 1), 1.0),
+    new(new DateTime(2024, 1, 2), 2.0),
+    new(new DateTime(2024, 1, 3), 3.0),
+};
 var query = DataSeries<double>.From(source).Filter(x => x > 1.5); // Rien n'est filtré encore
 
-source.Add(5.0);                // Modification de la source après
+source.Add(new DataPoint<double>(new DateTime(2024, 1, 4), 5.0)); // Modification après
 
 Console.WriteLine(query.Count); // Exécution ICI — 5.0 est inclus !
 ```

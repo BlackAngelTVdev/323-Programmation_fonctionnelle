@@ -23,10 +23,11 @@ Ce module introduit la programmation fonctionnelle en C# à travers LINQ. L'idé
 
 ## Théorie
 
+- [Slides](../slides/01-paradigmes/)
 - [Slides paradigmes (Kahoot)](https://create.kahoot.it/share/ict-323-paradigme/ed5b81f2-c5be-4aa4-9e50-acdbbe368c86)
 - [Théorie](../supports/source/01-paradigmes.md)
 - [Généricité — abstraire les types](../supports/source/01b-genericite.md)
-- Découverte de la syntaxe requête LINQ au moyen de la cheatsheet, entre les étapes 1 et 2 de l'exercice pratique
+- Découverte de la syntaxe requête LINQ au moyen de la [cheatsheet](../supports/source/references.md), entre les étapes 1 et 2 de l'exercice pratique
 - [Kahoot 01 paradigmes](https://create.kahoot.it/share/01-paradigmes-de-programmation/0f35b3fc-ffdc-471b-a983-5e121ec76a9d)
 
 ## Activités
@@ -41,7 +42,7 @@ Chaque thématique s'appuie sur **[le fil rouge](../exos/fil-rouge/esport/README
 
 ### Exercices complémentaires
 
-- [Place du marché](../exos/marché) — remise en main du C# et des outils, introduction à LINQ dans un contexte concret
+- [Place du marché](../exos/marché/) — remise en main du C# et des outils, introduction à LINQ dans un contexte concret
 
 - NCDU — créer un programme similaire à [ncdu](https://dev.yorhel.nl/ncdu) affichant les statistiques d'utilisation d'un répertoire Windows :
   - **Version 1** — sans LINQ : boucles et conditions classiques

@@ -1,3 +1,51 @@
+@media print {
+  /* Masquer tout sauf le contenu principal */
+  .VPNav,
+  .VPSidebar,
+  .VPDocAside,
+  .VPFooter,
+  .edit-link,
+  .prev-next,
+  #VPContent > .VPDoc > .container > .aside {
+    display: none !important;
+  }
+
+  /* Pleine largeur pour le contenu */
+  .VPDoc .container {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .VPDoc .content {
+    max-width: 100% !important;
+    padding: 0 1cm !important;
+  }
+
+  /* Fond blanc, texte noir */
+  body, .VPContent {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Liens visibles à l'impression */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #555;
+  }
+
+  /* Éviter les coupures de page dans les blocs de code */
+  pre, blockquote, .custom-block {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  h2, h3 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+}
+
 /* Sidebar: selected fil rouge context highlighted with brand color */
 .VPSidebarItem.fr-active-ctx > .item .text {
   color: var(--vp-c-brand-1);

@@ -10,6 +10,7 @@ Certains problèmes — arbres, fractales, brackets de tournoi — ne se résolv
 
 ## Théorie
 
+- [Slides](../slides/08-recursion/)
 - [Recursivite](../supports/source/08-Recursivite.md)
 - [Kahoot récap sur tout le module](https://create.kahoot.it/share/c-fonctionnel-linq-extension-recap/24dae2fb-b7e1-4fcd-9cec-818ebae195ae)
 - [Vidéo sur le flocon de Koch](https://eduvaud-my.sharepoint.com/:v:/g/personal/jonathan_melly_eduvaud_ch/EV2ZwK0TqlVFhB45A29vWAEBGe_lqvxtq1_S5IA6MsX75g?e=aDZRSO)

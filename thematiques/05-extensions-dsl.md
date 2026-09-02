@@ -10,6 +10,7 @@ Les méthodes d'extension permettent d'enrichir n'importe quel type sans en modi
 
 ## Théorie
 
+- [Slides](../slides/05-extensions/)
 - [Théorie sur les extensions en C#](../supports/source/05-Extension.md)
 
 **Particularités utiles pour les activités**

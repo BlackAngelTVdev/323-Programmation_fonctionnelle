@@ -4,7 +4,7 @@
 
 ## Concepts théoriques
 
-- [Thématique 03 — Map et transformation](../../../thematiques/03-map-transformation.md)
+- [Thématique 03 — Map et transformation](../../../../thematiques/03-map-transformation.md)
 - [Map / Select](../../../../supports/source/03-Map.md)
 - [Composition de pipelines](../../../../supports/source/03-Map.md#composition-de-pipelines)
 - [Closures dans les transformations](../../../../supports/source/03-Map.md#closures-dans-les-transformations)

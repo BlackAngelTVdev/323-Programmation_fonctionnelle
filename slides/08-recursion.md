@@ -156,7 +156,7 @@ layout: section
 
 <v-clicks>
 
-```csharp {1-6}
+```csharp {1-8}
 // Version itérative — compteur mutable
 int Factorial(int x)
 {
@@ -167,7 +167,7 @@ int Factorial(int x)
 // Factorial(6) → 720
 ```
 
-```csharp {1-5}
+```csharp {1-7}
 // Version récursive — aucune variable mutable
 int Factorial(int x)
 {
@@ -209,7 +209,7 @@ Chaque retour combine son résultat avec l'appelant.
 
 # Somme récursive et Fibonacci
 
-```csharp {1-6|8-9|all}
+```csharp {1-7|9-11|all}
 // Somme d'une liste — cas de base : liste vide
 int Sum(IEnumerable<int> list)
 {
@@ -243,7 +243,7 @@ layout: section
 
 # Deux faces de la même pièce
 
-```csharp {1-5|7-9|all}
+```csharp {1-6|8-11|all}
 // Récursion explicite — structure visible
 int SumRecursive(IEnumerable<int> list)
     => list.Any()
@@ -333,7 +333,7 @@ Factorial(100 000)
 
 <v-click>
 
-```csharp {1-5|7-11|all}
+```csharp {1-6|8-13|all}
 // Version NON tail-call : doit attendre le retour pour multiplier
 int Factorial(int x)
 {

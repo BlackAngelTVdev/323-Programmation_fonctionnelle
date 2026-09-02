@@ -4,7 +4,7 @@
 
 ## Concepts théoriques
 
-- [Thématique 05 — Extensions et DSL fluent](../../../thematiques/05-extensions-dsl.md)
+- [Thématique 05 — Extensions et DSL fluent](../../../../thematiques/05-extensions-dsl.md)
 - [Méthodes d'extension et chaînage](../../../../supports/source/05-Extension.md)
 - [Composition de fonctions f ∘ g](../../../../supports/source/05-Extension.md#composition-de-fonctions-f-∘-g)
 - [DSL — Domain Specific Language](../../../../supports/source/05-Extension.md#dsl-domain-specific-language)
@@ -51,7 +51,7 @@ public static class DataSeriesExtensions
 {
     public static void ToCsv(this DataSeries<double> series, string path)
     {
-        // générer les lignes "i,valeur" et écrire dans le fichier avec un en-tête
+        // générer les lignes "date,valeur" depuis DataPoints et écrire dans le fichier
         // ...
     }
 }
@@ -63,10 +63,12 @@ public static class DataSeriesExtensions
 ```csharp
 public static void ToCsv(this DataSeries<double> series, string path)
 {
-    var lines = series.Values.Select((v, i) => $"{i},{v:F4}");
-    File.WriteAllLines(path, lines.Prepend("index,value"));
+    var lines = series.DataPoints.Select(dp => $"{dp.Timestamp:yyyy-MM-dd},{dp.Value:F4}");
+    File.WriteAllLines(path, lines.Prepend("date,value"));
 }
 ```
+
+Chaque ligne porte la vraie date du match — le fichier est importable et triable dans Excel.
 
 </details>
 
@@ -119,9 +121,12 @@ public static DataSeries<(double Left, double Right)> PairWith(
 public static DataSeries<(double Left, double Right)> PairWith(
     this DataSeries<double> left, DataSeries<double> right)
     => DataSeries<(double, double)>.From(
-        left.Values.Zip(right.Values, (l, r) => (l, r))
+        left.DataPoints.Zip(right.DataPoints, (l, r) =>
+            new DataPoint<(double, double)>(l.Timestamp, (l.Value, r.Value)))
     );
 ```
+
+Les timestamps de la série gauche sont préservés dans le résultat — le CSV exporté via `ToCsv` reste daté.
 
 </details>
 

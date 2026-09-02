@@ -3,7 +3,7 @@
 Cet exercice sert tout d'abord à reprendre contact avec l'environnement de développement et le langage C#.
 Il va ensuite  vous emmener faire vos premiers pas dans LinQ en exerçant la syntaxe requête.
 
-Commencez par faire une copie du dossier `exo\marché` complet dans votre espace personnel. Ouvrez ensuite `place du marché.xlsx`.
+Commencez par faire une copie du dossier `exo\marché` complet dans votre espace personnel. Ouvrez ensuite [Place du marché.xlsx](<Place du marché.xlsx>).
 
 Ce classeur contient deux onglets
 1. La disposition des divers stands de la place du marché

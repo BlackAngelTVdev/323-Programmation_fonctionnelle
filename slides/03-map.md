@@ -118,7 +118,7 @@ layout: section
 
 # Extraire un attribut
 
-```csharp {1-9|11-13|15-17|all}
+```csharp {1-10|12-14|16-18|all}
 class Person {
     public string Name    { get; set; }
     public int    Age     { get; set; }
@@ -143,7 +143,7 @@ IEnumerable<int> siblings = people.Select(p => p.Sisters + p.Brothers);
 
 # Changer le type de sortie
 
-```csharp {1-3|5-8|10-11|all}
+```csharp {1-3|5-10|12-14|all}
 // double → double (Celsius → Kelvin)
 var kelvin = temps.Select(t => t + 273.15).ToList();
 // → [298.15, 310.15, ...]
@@ -217,7 +217,7 @@ layout: section
 
 # Select → imbriqué | SelectMany → aplati
 
-```csharp {1-7|9-13|all}
+```csharp {1-8|10-12|all}
 var teams = new[] {
     new { Player = "Léa",     Matches = new[] { "m1", "m2", "m3" } },
     new { Player = "Raphaël", Matches = new[] { "m4", "m5" } },
@@ -252,7 +252,7 @@ layout: section
 
 # Enchaîner Where et Select
 
-```csharp {1-6|8-9|all}
+```csharp {1-7|9-10|all}
 // f(g(x)) en maths = x.g().f() en LINQ
 var result = matches
     .Where(m => m.Deaths > 0)          // Filter → IEnumerable<Match>
@@ -278,7 +278,7 @@ L'immutabilité rend la composition possible.
 
 # Captures dans Select — même règle que Where
 
-```csharp {1-3|5-6|8|all}
+```csharp {1-3|5|7-8|all}
 double factor = 1.5; // capturé par le lambda ci-dessous
 
 var boosted = players.Select(p => p.Kda * factor); // lien vers factor

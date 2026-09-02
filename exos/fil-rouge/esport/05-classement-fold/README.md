@@ -4,7 +4,7 @@
 
 ## Concepts théoriques
 
-- [Thématique 04 — Fold et agrégation](../../../thematiques/04-fold-agregation.md)
+- [Thématique 04 — Fold et agrégation](../../../../thematiques/04-fold-agregation.md)
 - [Fold — l'agrégation universelle](../../../../supports/source/04-Reduce.md#fold-—-l-agregation-universelle)
 - [GroupBy — agrégation par clé](../../../../supports/source/04-Reduce.md#groupby)
 

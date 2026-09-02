@@ -136,7 +136,7 @@ seed → [e1] → acc1 → [e2] → acc2 → [e3] → ... → résultat
 
 <v-clicks>
 
-```csharp {1-7}
+```csharp {1-6}
 // Aggregate(seed=0, f=(acc,val)=>acc+val)  sur [1,2,3,4,5]
 // acc= 0 + 1 → 1
 // acc= 1 + 2 → 3
@@ -155,7 +155,7 @@ numbers.Aggregate(0, (acc, val) => acc + val) // → 15
 
 # Trois variantes d'Aggregate
 
-```csharp {1-2|4-5|7-10|all}
+```csharp {1-2|4-5|7-12|all}
 // 1. Sans seed (premier élément = seed)
 numbers.Aggregate((acc, val) => acc + val); // → 15
 
@@ -181,7 +181,7 @@ layout: section
 
 # Tout est un Fold
 
-```csharp {1-5|7-10|12-15|all}
+```csharp {1-4|6-11|13-15|all}
 var numbers = new[] { 1, 2, 3, 4, 5 };
 
 // Sum → accumuler avec +

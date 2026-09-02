@@ -4,7 +4,7 @@
 
 ## Concepts théoriques
 
-- [Thématique 08 — Récursivité](../../../thematiques/08-recursion.md)
+- [Thématique 08 — Récursivité](../../../../thematiques/08-recursion.md)
 - [Récursivité — décomposition fonctionnelle](../../../../supports/source/08-Recursivite.md)
 - [Récursion et Fold](../../../../supports/source/08-Recursivite.md#recursion-et-fold)
 
@@ -95,7 +95,7 @@ Prédire le résultat pour 8 éléments avec `minSize = 2` :
 </details>
 
 ```csharp
-var series8   = DataSeries<double>.From(kdaLea.Values.Take(8));
+var series8   = DataSeries<double>.From(kdaLea.DataPoints.Take(8));
 var subSeries = series8.Decompose(minSize: 2);
 
 Console.WriteLine(subSeries.Count()); // 4
@@ -103,20 +103,24 @@ foreach (var s in subSeries)
     Console.WriteLine($"  [{string.Join(", ", s.Values.Select(v => v.ToString("F2")))}]");
 ```
 
+`DataPoints.Take(8)` préserve les timestamps des 8 premiers matchs — les sous-séries restent datées.
+
 ---
 
 ## Étape 3 — Bracket de tournoi simplifié
 
 ```csharp
-var series = DataSeries<double>.From(kdaLea.Smooth(1).Values.Take(8));
+var series = DataSeries<double>.From(kdaLea.Smooth(1).DataPoints.Take(8));
 
 // Ronde 1 : 4 fenêtres de 2 matchs
 var round1 = series.Decompose(2).Select(s => s.Statistics().Mean).ToList();
 Console.WriteLine("Ronde 1 (KDA moyen par paire) :");
 round1.ForEach(m => Console.WriteLine($"  {m:F2}"));
 
-// Ronde 2 : combiner les paires en quarts
-var round2 = DataSeries<double>.From(round1).Decompose(1).Select(s => s.Statistics().Mean);
+// Ronde 2 : les moyennes de ronde 1 sont des valeurs synthétiques — timestamps arbitraires
+var round2 = DataSeries<double>.From(
+    round1.Select((v, i) => new DataPoint<double>(new DateTime(2024, 1, i + 1), v))
+).Decompose(1).Select(s => s.Statistics().Mean);
 Console.WriteLine("Ronde 2 (KDA moyen par quart) :");
 foreach (var m in round2) Console.WriteLine($"  {m:F2}");
 ```

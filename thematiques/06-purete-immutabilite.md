@@ -10,6 +10,7 @@ Depuis l'exercice 01, la bibliothèque `DataSeries<T>` utilise des propriétés 
 
 ## Théorie
 
+- [Slides](../slides/06-purete/)
 - [Pureté](../supports/source/06-PureteImmutabilite.md#purete)
 - [Immutabilité](../supports/source/06-PureteImmutabilite.md#immutabilite)
 - [06-PureteImmutabilite PPT](../supports/source/06-PureteImmutabilite.pptx)

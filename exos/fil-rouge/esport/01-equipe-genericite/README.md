@@ -4,7 +4,7 @@
 
 ## Concepts théoriques
 
-- [Thématique 01 — Paradigmes fonctionnels](../../../thematiques/01-paradigmes-fonctionnels.md)
+- [Thématique 01 — Paradigmes fonctionnels](../../../../thematiques/01-paradigmes-fonctionnels.md)
 - [Impératif ou déclaratif](../../../../supports/source/01-paradigmes.md#imperatif-ou-declaratif)
 - [Généricité — abstraire les types](../../../../supports/source/01b-genericite.md)
 - Immutabilité (propriétés get-only) — introduction, approfondie en exercice 07
@@ -65,7 +65,13 @@ public class DataPoint<T>
         Value = value;
     }
 }
+```
 
+`DataPoint<T>` est l'unité élémentaire d'une série temporelle : `Timestamp` indique **quand**,
+`Value` indique **quoi**. `DataSeries<T>` stocke des `DataPoint<T>` — chaque donnée chargée
+depuis CSV (exercice 02) sera enveloppée avec la date du match.
+
+```csharp
 public class ValorantMatch
 {
     public string Player { get; }
@@ -129,8 +135,8 @@ Quel type C# représente "une séquence dont on ne connaît pas encore le conten
 <details>
 <summary>Indice sur le type à utiliser</summary>
 
-`IEnumerable<T>` — il représente une séquence parcourable sans en connaître la taille ni le type concret.
-Un champ `private readonly` empêche toute mutation ultérieure.
+`IEnumerable<DataPoint<T>>` — une séquence de points datés, parcourable sans en connaître
+la taille ni le type concret. Un champ `private readonly` empêche toute mutation ultérieure.
 
 </details>
 
@@ -139,14 +145,15 @@ Implémenter dans `DataSeries/DataSeries.cs` :
 ```csharp
 public class DataSeries<T>
 {
-    private readonly IEnumerable<T> _data;
+    private readonly IEnumerable<DataPoint<T>> _data;
 
-    private DataSeries(IEnumerable<T> data) => // ...
+    private DataSeries(IEnumerable<DataPoint<T>> data) => // ...
 
-    public static DataSeries<T> From(IEnumerable<T> source) => // ...
+    public static DataSeries<T> From(IEnumerable<DataPoint<T>> source) => // ...
 
     public int Count => // ...
-    public IEnumerable<T> Values => // ...
+    public IEnumerable<T> Values             => // ...  (valeurs sans date)
+    public IEnumerable<DataPoint<T>> DataPoints => // ...  (valeurs avec date)
 }
 ```
 
@@ -156,19 +163,22 @@ public class DataSeries<T>
 ```csharp
 public class DataSeries<T>
 {
-    private readonly IEnumerable<T> _data;
+    private readonly IEnumerable<DataPoint<T>> _data;
 
-    private DataSeries(IEnumerable<T> data) => _data = data;
+    private DataSeries(IEnumerable<DataPoint<T>> data) => _data = data;
 
-    public static DataSeries<T> From(IEnumerable<T> source)
+    public static DataSeries<T> From(IEnumerable<DataPoint<T>> source)
         => new DataSeries<T>(source);
 
     public int Count => _data.Count();
-    public IEnumerable<T> Values => _data;
+    public IEnumerable<T> Values             => _data.Select(dp => dp.Value);
+    public IEnumerable<DataPoint<T>> DataPoints => _data;
 }
 ```
 
-> Note : éviter `ToList()` dans le constructeur — la raison sera expliquée en exercice 03 (paresse).
+> `Values` retourne les valeurs sans date — adapté pour les analyses statistiques.
+> `DataPoints` retourne les `DataPoint<T>` complets — adapté pour les requêtes temporelles (exercice 02+).
+> Ne pas faire `ToList()` dans le constructeur : la raison sera expliquée en exercice 03 (paresse).
 
 </details>
 
@@ -188,12 +198,13 @@ public class DataSeries<T>
 > ```csharp
 > public class DataSeries<T>
 > {
->     private readonly IEnumerable<T> _data;
+>     private readonly IEnumerable<DataPoint<T>> _data;
 >
->     public DataSeries(IEnumerable<T> data) => _data = data;
+>     public DataSeries(IEnumerable<DataPoint<T>> data) => _data = data;
 >
 >     public int Count => _data.Count();
->     public IEnumerable<T> Values => _data;
+>     public IEnumerable<T> Values             => _data.Select(dp => dp.Value);
+>     public IEnumerable<DataPoint<T>> DataPoints => _data;
 > }
 >
 > // Utilisation :
@@ -208,9 +219,9 @@ Vérifier avec trois matchs en dur :
 ```csharp
 var valorantMatches = new[]
 {
-    new ValorantMatch("Léa", "Jett",  18, 6, 4, 8,  13, true),
-    new ValorantMatch("Léa", "Reyna", 22, 8, 2, 11,  9, false),
-    new ValorantMatch("Léa", "Neon",  20, 7, 5,  9, 13, true),
+    new DataPoint<ValorantMatch>(new DateTime(2024, 1, 15), new ValorantMatch("Léa", "Jett",  18, 6, 4, 8,  13, true)),
+    new DataPoint<ValorantMatch>(new DateTime(2024, 2,  3), new ValorantMatch("Léa", "Reyna", 22, 8, 2, 11,  9, false)),
+    new DataPoint<ValorantMatch>(new DateTime(2024, 3, 10), new ValorantMatch("Léa", "Neon",  20, 7, 5,  9, 13, true)),
 };
 
 var valorant = DataSeries<ValorantMatch>.From(valorantMatches);
@@ -276,15 +287,15 @@ Créer deux ou trois matchs en dur pour chaque jeu et vérifier que le **même**
 ```csharp
 var cs2 = DataSeries<Cs2Match>.From(new[]
 {
-    new Cs2Match("Raphaël", "Mirage",  "CT", 21, 14, 5, 2, true),
-    new Cs2Match("Kiara",   "Dust2",   "T",  26, 11, 1, 4, true),
-    new Cs2Match("Raphaël", "Inferno", "T",  14, 16, 6, 1, false),
+    new DataPoint<Cs2Match>(new DateTime(2024, 1, 20), new Cs2Match("Raphaël", "Mirage",  "CT", 21, 14, 5, 2, true)),
+    new DataPoint<Cs2Match>(new DateTime(2024, 2,  7), new Cs2Match("Kiara",   "Dust2",   "T",  26, 11, 1, 4, true)),
+    new DataPoint<Cs2Match>(new DateTime(2024, 3,  1), new Cs2Match("Raphaël", "Inferno", "T",  14, 16, 6, 1, false)),
 });
 
 var lol = DataSeries<LolMatch>.From(new[]
 {
-    new LolMatch("Noé", "Thresh", 2, 4, 18, 42, 71, true),
-    new LolMatch("Noé", "Thresh", 1, 6, 12, 35, 64, false),
+    new DataPoint<LolMatch>(new DateTime(2024, 1, 22), new LolMatch("Noé", "Thresh", 2, 4, 18, 42, 71, true)),
+    new DataPoint<LolMatch>(new DateTime(2024, 2, 10), new LolMatch("Noé", "Thresh", 1, 6, 12, 35, 64, false)),
 });
 
 Console.WriteLine($"CS2 : {cs2.Count} matchs, LoL : {lol.Count} matchs"); // 3 et 2

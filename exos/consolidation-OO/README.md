@@ -334,6 +334,6 @@ Personne alice = new Personne(); // "instancier" la classe Personne
 
 ## Dojo Randori
 
-Reprenons l'exercice [Parachutes](<../exos/Parachutes%20(OO)/>) que vous avez peut-être vu au début du module I320.
+Reprenons l'exercice [Parachutes](<../Parachutes%20(OO)/>) que vous avez peut-être vu au début du module I320.
 
 Chacun à votre tour, vous allez venir coder un petit bout de cet exercice qui nous fera revisiter la grande majorité de ces concepts OO, qui nous seront indispensables dans la suite de ce module.

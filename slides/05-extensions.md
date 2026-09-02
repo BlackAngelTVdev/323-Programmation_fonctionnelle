@@ -73,7 +73,7 @@ layout: section
 
 # La recette : classe statique + `this`
 
-```csharp {1-6|8-9|all}
+```csharp {1-7|9-10|all}
 // Classe publique statique + méthode publique statique
 // + mot-clé "this" devant le PREMIER paramètre
 public static class StringExtensions
@@ -99,7 +99,7 @@ La classe doit être `public static`.
 
 # LINQ est 100% construit sur les extensions
 
-```csharp {1-4|6-10|all}
+```csharp {1-4|6-11|all}
 // La vraie signature de Where (simplifiée) :
 public static IEnumerable<T> Where<T>(
     this IEnumerable<T> source,
@@ -126,7 +126,7 @@ C'est ce qui rend le chaînage naturel.
 
 # Chaîner avec retour de valeur
 
-```csharp {1-7|9-14|all}
+```csharp {1-7|9-15|all}
 public static IEnumerable<string> ToLower(
     this IEnumerable<string> source, bool random = false)
 {
@@ -171,7 +171,7 @@ public void TestIsMatch()
 // Sans connaître FluentAssertions, le sens est évident
 ```
 
-```csharp {1-6}
+```csharp {1-7}
 // Cosmos — tester un interpréteur de langage custom
 [Fact]
 public void TestDifferentNumber()
@@ -264,7 +264,7 @@ C# LINQ :  x.g().f()   ← même chose, lecture gauche → droite
 
 <v-click>
 
-```csharp {1-4|6-10|all}
+```csharp {1-2|4-8|all}
 // Sans extensions — lecture de droite à gauche, difficile à suivre
 var r = ToUpperCase(RemoveSpaces(Trim(input)));
 
@@ -281,7 +281,7 @@ var r = input
 
 # Le contrat : retourner le même type
 
-```csharp {1-6|8-9|all}
+```csharp {1-9|11-15|all}
 // Chaque méthode reçoit IEnumerable<T> et retourne IEnumerable<T>
 // → le chaînage est possible
 numbers

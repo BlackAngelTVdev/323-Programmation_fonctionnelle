@@ -10,6 +10,7 @@ Après avoir filtré des collections, l'étape naturelle est de les transformer.
 
 ## Théorie
 
+- [Slides](../slides/03-map/)
 - [Exemple introductif](../supports/source/03-MapIntro.md)
 - [Condensé PPT](../supports/source/03-Map.pptx)
 - [Théorie complète](../supports/source/03-Map.md)
@@ -32,7 +33,7 @@ Répondre aux besoins du fil rouge en enrichissant la bibliothèque `DataSeries<
 
 #### Activités prioritaires
 
-- [Mib-map](../exos/mib-map) — échauffement Map
+- [Mib-map](../exos/mib-map/) — échauffement Map
 - [Rando](../exos/rando/)
 
 #### Activités libres

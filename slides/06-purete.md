@@ -125,7 +125,7 @@ Pas de réseau, pas d'heure système, pas d'état externe.
 
 # Pure vs Impure — les trois cas
 
-```csharp {1-3|5-7|9-14|all}
+```csharp {1-3|5-7|9-15|all}
 // ✅ PURE
 double KDA(int kills, int deaths, int assists)
     => (kills + assists) / (double)(deaths == 0 ? 1 : deaths);
@@ -154,7 +154,7 @@ layout: section
 
 # Remplacer un appel par sa valeur
 
-```csharp {1-5|7-10|all}
+```csharp {1-2|4-5|all}
 // Fonction pure — référentiellement transparente
 double KDA(int k, int d, int a) => (k + a) / (double)(d == 0 ? 1 : d);
 
@@ -265,7 +265,7 @@ On ne modifie pas — on crée une nouvelle valeur à partir de l'ancienne.
 
 # Fausse immutabilité — piège courant
 
-```csharp {1-7|9-12|all}
+```csharp {1-7|9-13|all}
 static class ImmutableIntList
 {
     static readonly List<int> items = new();
@@ -300,7 +300,7 @@ layout: section
 
 # Le problème : verbosité des classes immuables
 
-```csharp {1-10|all}
+```csharp {1-12|all}
 // Classe immuable à la main — ~10 lignes de plomberie
 public class Point
 {
@@ -328,7 +328,7 @@ Le mot-clé `record` (C# 9) génère tout cela automatiquement — en **une lign
 
 # Record : une ligne, tout inclus
 
-```csharp {1|3-7|9-12|all}
+```csharp {1|3-5|7-9|11-13|all}
 public record Point(double X, double Y);
 
 // Immutabilité

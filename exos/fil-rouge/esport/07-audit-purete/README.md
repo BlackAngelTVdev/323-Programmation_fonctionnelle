@@ -4,7 +4,7 @@
 
 ## Concepts théoriques
 
-- [Thématique 06 — Pureté et immutabilité](../../../thematiques/06-purete-immutabilite.md)
+- [Thématique 06 — Pureté et immutabilité](../../../../thematiques/06-purete-immutabilite.md)
 - [Pureté et effets de bord](../../../../supports/source/06-PureteImmutabilite.md)
 - [Records C# — l'immutabilité par défaut](../../../../supports/source/06-PureteImmutabilite.md#records-c-—-l-immutabilite-par-defaut)
 - [Transparence référentielle](../../../../supports/source/06-PureteImmutabilite.md#transparence-referentielle)
@@ -174,10 +174,15 @@ a changé entre-temps ?
 Tester le couplage caché :
 
 ```csharp
-var source = new List<double> { 1.0, 2.0, 3.0 };
+var source = new List<DataPoint<double>>
+{
+    new(new DateTime(2024, 1, 1), 1.0),
+    new(new DateTime(2024, 1, 2), 2.0),
+    new(new DateTime(2024, 1, 3), 3.0),
+};
 var series = DataSeries<double>.From(source);
 
-source.Add(4.0);
+source.Add(new DataPoint<double>(new DateTime(2024, 1, 4), 4.0));
 Console.WriteLine(series.Count); // Combien ? Pourquoi ?
 ```
 
@@ -192,7 +197,7 @@ Vérifier :
 
 ```csharp
 var series = DataSeries<double>.From(source).Snapshot();
-source.Add(4.0);
+source.Add(new DataPoint<double>(new DateTime(2024, 1, 4), 4.0));
 Console.WriteLine(series.Count); // 3 — snapshot isolé de la source
 ```
 

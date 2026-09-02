@@ -136,7 +136,7 @@ et qu’à
 - **droite** est décrit le comportement (corps).
 
 #### Signature
-Pour spéficier les arguments avec un lambda, il y a 3 cas principaux
+Pour spéficier les arguments avec un lambda, il y a 3 cas principaux pour la définition de paramètre:
 
 **1. Pas d’argument**
 ```csharp
@@ -148,7 +148,7 @@ Func<int> one = () => 1;
 
 **2. Argument non utilisé (underscore)**
 ```csharp
-//Fonction avec un paramètre dont le lambda ne tient pas compte et retourne la valeur 2
+//Fonction avec un paramètre dont le lambda ne tient pas compte et retourne toujours la valeur 2
 Func<int,int> two = _ => 2;
 ```
 
@@ -157,6 +157,8 @@ Func<int,int> two = _ => 2;
 //Fonction avec un paramètre et retourne la valeur doublée
 Func<int,int> x2 = x => x*2;
 ```
+
+Les règles ci-dessus s'appliquent aux fonctions à plusieurs paramètres:
 
 **4. Plusieurs arguments utilisés**
 ```csharp
@@ -170,11 +172,18 @@ Func<int,int,int> add = (x,y) => x + y;
 Func<int,int,int> add2 = (x,_) => x + 2;
 ```
 
->À noter que les parenthèses des arguments sont optionnelles (sauf s’il n’y en a pas)
+>À noter que les parenthèses des arguments ne sont optionnelles **que lorsqu’il y a exactement un paramètre**. Elles restent obligatoires s’il n’y en a aucun (cas 1) ou s’il y en a plusieurs (cas 4 et 5).
+>
+>| Nombre de paramètres | Parenthèses |
+>|---|---|
+>| 0 | obligatoires |
+>| 1 | optionnelles |
+>| 2 ou plus | obligatoires |
 
 ```csharp
-//Fonction avec un paramètre et retourne la valeur doublée
+//Fonction avec un paramètre et retourne la valeur doublée, les 2 écritures sont équivalentes
 Func<int,int> x2 = (x) => x*2;
+Func<int,int> x2bis = x => x*2;
 ```
 
 ### Action et lamdba combinés

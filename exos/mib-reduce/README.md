@@ -20,7 +20,7 @@ List<Product> products = new List<Product>
 
 ## Reduce
 
-À partir du [résultat précédent](#1-chiffre-daffaire-international-anonyme), déterminer et afficher, **à l’aide [d’aggrégateurs](../../supports/source/03-MapReduce.md#accumulateur--aggrégateur--reduce)**:
+À partir du [résultat précédent](#1-chiffre-daffaire-international-anonyme), déterminer et afficher, **à l’aide [d’aggrégateurs](../../supports/source/03-Map.md#accumulateur--aggrégateur--reduce)**:
 
 0. La quantité de groseilles disponibles sur le marché
 1. Le chiffre d’affaire possible **total** pour chaque marchand (tout produit confondu)
