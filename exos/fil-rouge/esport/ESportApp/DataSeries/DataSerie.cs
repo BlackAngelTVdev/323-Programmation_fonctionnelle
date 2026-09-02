@@ -31,9 +31,9 @@ namespace DataSeries
             } catch (Exception e) {
                 Console.WriteLine($"Erreur d'ouverture du fichier {e.Message}");
             }
-            return new DataSerie<T>(data);
+            return From(data);
         }
-
+        
         public int Count => _data.Count();
         public IEnumerable<T> Values => _data;
     }
