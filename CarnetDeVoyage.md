@@ -75,7 +75,11 @@ On a expliqué rapidement les concepts de lazy/eager loading et classes d'extens
 
 On a commencé à jouer avec nos statistiques grâce aux premières méthodes LinQ de la [cheatsheet](./supports/linq-cheatsheet.pdf): combien de victoires ? A quand remonte la dernière défaite de Léa ? Quelles sont les stats du troisième match de Dylan ? ...
 
-Les dernières minutes se passent "en roue libre". J'ai l'impression qu'il y a saturation.
+On ne comprenait pas pourquoi on n'arrivait pas à compter les victoires de Léa.  
+Ce mystère est élucidé: le premier test (`cols[8] == 'TRUE'`), tout comme le deuxième (`cols[8] == 'VRAI'`) échouaient parce que la valeur dans le fichier est `true` en minuscule. Nous avons en plus été mystifié par Excel qui se croit toujours plus malin que nous: il lit `true` dans le fichier, mais il affiche `VRAI` parce qu'il est configuré en français.  
+`bool.Parse(cols[8])` suggéré par Tony est une meilleure approche, mais attention car il ne tient pas compte de la locale et ça se crashe si on met `VRAI` dans le fichier.
+
+Les dix dernières minutes se passent "en roue libre". J'ai l'impression qu'il y a saturation.
 
 <hr>
 
@@ -90,4 +94,15 @@ Prérequis:
 
 ### Mercredi
 
-On va faire le checkpoint #2, qui porte sur les fonctions d'ordre supérieur et les première méthode d'extension LinQ
+On va faire le checkpoint #2 pour voir ce que vous avez retenu au sujet des fonctions d'ordre supérieur et des première méthodes d'extension LinQ
+
+On a grimpé une pente bien raide la semaine passée. Cette semaine, on va pouvoir récupérer un peu sur un chemin bien plus plat.  
+Mais il va quand même falloir avancer...
+
+Chacun commencera par finaliser - si besoin - sa version de ESportApp qui lit les fichiers .csv. Cet état fera l'objet d'un commit. 
+- Génération
+- Interface CLI
+  - `--help`
+  - `--folder folder_name`
+  - `--error [strict | soft]` 
+- Transformer (Select)

@@ -15,35 +15,21 @@
 Le dataset contient maintenant les données réelles (CSV) et les données générées (exercice 02).
 Avant toute analyse, il faut valider que les contraintes sont respectées dans les trois sources.
 
----
+<hr>
 
-## Étape 1 — Implémenter `.Filter(predicate)`
+## Étape 1 — Implémenter `.Outliers(predicate)`
 
-**Avant de coder :** `Filter` doit retourner une nouvelle `DataSeries<T>`, pas modifier l'existante.
-Quelle méthode LINQ applique un prédicat à une séquence ?
+On appelle "Outlier" une valeur aberrante, impossible dans une série. Si on a a par exemple une série de mesures de la température du lac, la valeur "234" est un outlier.  
+Le but de cette méthode est de montrer les outliers. On lui passe une fonction qui détermine si une valeur est "outlier" ou pas.
 
-<details>
-<summary>Indice</summary>
-
-`Where(predicate)` filtre une `IEnumerable<T>` sans modifier la source.
-Il suffit d'envelopper le résultat dans une nouvelle `DataSeries<T>`.
-
-</details>
-
-```csharp
-public DataSeries<T> Filter(Func<T, bool> predicate)
-{
-    // retourner une nouvelle DataSeries contenant seulement les éléments qui satisfont le prédicat
-    // ...
-}
-```
+**Attention :** `Outliers` doit retourner une nouvelle `DataSeries<T>`, pas modifier l'existante.
 
 <details>
 <summary>Voir la solution</summary>
 
 ```csharp
-public DataSeries<T> Filter(Func<T, bool> predicate)
-    => new DataSeries<T>(_data.Where(predicate));
+public DataSeries<T> Outliers(Func<T, bool> predicate)
+    => DataSeries<T>.From(_data.Where(predicate));
 ```
 
 </details>
@@ -59,25 +45,16 @@ Console.WriteLine(valorant.Count); // 25 — inchangé
 Console.WriteLine(wins.Count);     // sous-ensemble
 ```
 
-**Les prédicats sont des valeurs.** Plutôt que d'écrire les lambdas en ligne, les déclarer,
-les nommer et les combiner comme n'importe quelle variable :
 
-```csharp
-Func<ValorantMatch, bool> isWin       = m => m.Won;
-Func<ValorantMatch, bool> isHighScore = m => m.Kills > 20;
+// TODO Finir ça proprement
 
-// Combinaison : un nouveau prédicat (victoire éclatante) construit à partir des deux autres
-Func<ValorantMatch, bool> isCrushingWin = m => isWin(m) && isHighScore(m);
 
-var top = valorant.Filter(isCrushingWin);
-```
 
-Une fonction stockée dans une variable se passe, se combine, se réutilise —
-→ [Fonctions comme valeurs](../../../../supports/source/02a-fonctions-sup.md)
+<hr>
 
----
+## Étape 2 — Implémenter `.Sanitize(predicate)`
 
-## Étape 2 — Implémenter `.RemoveOutliers(isValid)`
+Cette méthode nettoie une série en enlevant les outliers
 
 **Avant de coder :** quelle est la différence entre `Filter` et `RemoveOutliers` ?
 Peut-on éviter de dupliquer du code ?

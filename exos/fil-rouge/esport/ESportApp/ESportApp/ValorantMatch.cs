@@ -29,5 +29,10 @@ namespace DataSeries
             RoundsWon = roundsWon;
             Won = won;
         }
+
+        public override string ToString()
+        {
+            return $"Player: {Player}, Agent: {Agent}, Kills: {Kills}, Deaths: {Deaths}, Assists: {Assists}, Headshots: {Headshots}, Rounds Won: {RoundsWon}, Won: {Won}";
+        }
     }
 }

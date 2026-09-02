@@ -41,5 +41,10 @@ namespace DataSeries
         
         public int Count => _data.Count();
         public IEnumerable<T> Values => _data;
+
+        public override string ToString()
+        {
+            return $"DataSerie<{typeof(T).Name}>: {Count} points: {Environment.NewLine}{String.Join(Environment.NewLine,_data.Select(s => s).ToArray())}";
+        }
     }
 }
