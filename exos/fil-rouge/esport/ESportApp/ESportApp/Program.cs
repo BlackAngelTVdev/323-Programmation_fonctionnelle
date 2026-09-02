@@ -35,8 +35,6 @@ DataSerie<DataPoint<LolMatch>> noeswins = DataSerie<DataPoint<LolMatch>>.From(
     .ToList()
     );
 
-lol.Values.First().Value.Champion = "Héhéhéhé !!!";
-
 Console.WriteLine(noeswins);
 
 Console.ReadKey();

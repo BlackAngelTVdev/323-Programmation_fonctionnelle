@@ -21,7 +21,7 @@ namespace ESportApp
         }
 
         public string Player { get; }
-        public string Champion { get; set; }
+        public string Champion { get; }
         public int Kills { get; }
         public int Deaths { get; }
         public int Assists { get; }
