@@ -121,3 +121,32 @@ Chacun commencera par finaliser - si besoin - sa version de ESportApp qui lit le
   - `--folder folder_name`
   - `--error [strict | soft]`
 - Transformer (Select)
+
+<hr>
+
+## Semaine 38 (14 septembre)
+
+### Lundi
+
+Il faut qu'on discute, parce que je fais un constat que je n'arrive pas à expliquer. Quelque chose m'échappe peut-être.
+
+On travaille 3 heures ensemble le lundi matin, sur un projet dans lequel vous devez tenir un journal de travail et appliquer de bonnes pratiques en matière de contrôle de version.
+
+Je m'attends donc à ce que dans chacun de vos repos je trouve un dernier commit fait aux alentours de 11h25, qui serait nommé "chore(jdt): Mettre à jour avec les activités de ce matin".
+
+Or voici ce que je vois:
+```
+albert          2026-09-04 10:26     feat(readme): ajout du rapport
+damienc         2026-09-07 09:26     feat(P_FUN): Ajout structure du projet
+damienr         2026-09-07 11:09     WIP chore(scripts): ajoute le script get_commit
+erdem           2026-09-04 23:12     doc(jdt) Ajout Jdt
+gianmarco       2026-09-07 11:25     fix(Importation): Importation des données
+gillian         2026-09-07 10:59     feat(front): Ajout d'un frontend de base pour l'application
+kiril           2026-09-07 11:24     feat : ajout de composant pour import des data [WIP]
+sacha           2026-09-07 10:29     feat(PROJET) Création du library DataPoint et DataSerie
+snehan          2026-09-04 09:12     docs(Rapport, jdt): Correction du rapport en accord avec les remarques de l'enseignant
+theophile       2026-09-07 10:06     add base avalonia template
+tony            2026-09-07 09:27     Auto-generate files via JDT-Generator
+zidane          2026-09-07 11:27     doc(jdt): Mise à jour du jdt et création du doc
+```
+
