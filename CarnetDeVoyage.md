@@ -44,6 +44,7 @@ On n'est pas arrivé au bout de l'exercice, on reprendra ça la semaine prochain
 <hr>
 
 ## Semaine 36 (31 août)
+
 ### Lundi
 
 La mission du jour était: finaliser l'analyse fonctionnelle et la planification initiale. Idéalement, il aurait dû être possible de faire la livraison de vendredi dès aujourd'hui en fin de matinée.
@@ -51,7 +52,7 @@ La mission du jour était: finaliser l'analyse fonctionnelle et la planification
 J'ai passé vers à peu près tout le monde. Le constat est que la rédaction de User Stories n'est pas encore maîtrisée, personne n'ayant pu me montrer une user story bien formulée du premier coup.  
 Je tiens à ce que le codage ne commence qu'à partir du moment où au moins une US est bien formulée. Je préfère avoir un petit nombre de US de bonne qualité que beaucoup de US de mauvaise qualité. Conséquence:
 
-> Pour la livraison du 4 septembre, je ne damande pas une analyse fonctionnelle complète. Je n'attends que une ou deux US totalisant au minimum 5 bons tests d'acceptance 
+> Pour la livraison du 4 septembre, je ne damande pas une analyse fonctionnelle complète. Je n'attends que une ou deux US totalisant au minimum 5 bons tests d'acceptance
 
 N'ayant reçu aucune livraison pour l'instant (mardi), j'en déduis que tout le monde a encore du travail à fournir pour arriver à ce stade.
 
@@ -60,6 +61,7 @@ N'ayant reçu aucune livraison pour l'instant (mardi), j'en déduis que tout le 
 On a fait le checkpoint #1. Les résultats sont ... moyens. En même temps, très peu étaient ceux qui avaient révisé.
 
 On a vu ensemble la solution du début de l'étape 1 de l'application ESportApp, dans laquelle on sépare clairement les aspects métiers et les "logistique":
+
 - Le projet `ESportApp` contient des classes propres au domaine (métier): `CS2Match`, `LolMatch`, `ValorantMatch`)
 - Le projet `Dataseries` contient les moyens de gérer des séries de `<un_certain_type>`
 
@@ -84,11 +86,31 @@ Les dix dernières minutes se passent "en roue libre". J'ai l'impression qu'il y
 <hr>
 
 ## Semaine 37 (7 septembre)
+
 ### Lundi
+
+Rappel de l'une des valeurs Agile:
+
+> L'adaptation plutôt que l'exécution d'un plan
+
+Mon plan était: évaluer de menière définitive le critère "Expression" après la première livraison. Je m'attendais à ce que seulement un ou deux n'aient pas atteint le niveau attendu et j'aurais envisagé une possibilité de remédiation en fin de projet.  
+Mais là, si j'exécute ce plan, la majorité de la classe serait déjà en non-acquis. Cela n'est pas productif. Je réévaluerai le début du rapport.
+
+J'ai ajouté des commentaires sur MarketPlace, prenez-en connaissance.
+
+Faire un projet en méthodologie Agile ne veut pas dire avoir carte blanche pour faire comme on veut.  
+J'attire votre attention sur la formulation "plutôt que" dans les valeurs agiles. "Un logiciel fonctionnel plutôt qu'une documentation exhaustive" ne veut pas dire que seul le résultat compte.
+
+Tenez compte de ces retours, parce que:
+
+> Ne pas tenir compte de consignes et feedback répétés peut coûter un joker
+
+Maintenant on peut y aller...
 
 Objectif: pouvoir commencer la réalisation
 
 Prérequis:
+
 - Avoir au moins une US valide dans laquelle la séquence de démarrage de l'application est décrite
 - Avoir des données à disposition (5 séries cohérentes de 500 valeurs chacune)
 
@@ -99,10 +121,11 @@ On va faire le checkpoint #2 pour voir ce que vous avez retenu au sujet des fonc
 On a grimpé une pente bien raide la semaine passée. Cette semaine, on va pouvoir récupérer un peu sur un chemin bien plus plat.  
 Mais il va quand même falloir avancer...
 
-Chacun commencera par finaliser - si besoin - sa version de ESportApp qui lit les fichiers .csv. Cet état fera l'objet d'un commit. 
+Chacun commencera par finaliser - si besoin - sa version de ESportApp qui lit les fichiers .csv. Cet état fera l'objet d'un commit.
+
 - Génération
 - Interface CLI
   - `--help`
   - `--folder folder_name`
-  - `--error [strict | soft]` 
+  - `--error [strict | soft]`
 - Transformer (Select)
