@@ -128,7 +128,8 @@ Chacun commencera par finaliser - si besoin - sa version de ESportApp qui lit le
 
 ### Lundi
 
-Il faut qu'on discute, parce que je fais un constat que je n'arrive pas à expliquer. Quelque chose m'échappe peut-être.
+Il faut qu'on discute, parce que je fais un constat qui me dérange et que je ne trouve pas les bonnes raisons qui pourraient l'expliquer.  
+Peut-être que quelque chose m'échappe.
 
 On travaille 3 heures ensemble le lundi matin, sur un projet dans lequel vous devez tenir un journal de travail et appliquer de bonnes pratiques en matière de contrôle de version.
 
