@@ -108,19 +108,30 @@ Mais tout le monde a une story en cours de réalisation.
 
 ### Mercredi
 
-On va faire le checkpoint #2 pour voir ce que vous avez retenu au sujet des fonctions d'ordre supérieur et des première méthodes d'extension LinQ
+On va faire le checkpoint #2 pour voir ce que vous avez retenu au sujet des fonctions d'ordre supérieur et des première méthodes d'extension LinQ.  
+Si vous avez terminé avant la fin du temps à disposition, utilisez ce temps pour compléter et/ou committer votre JdT. 
 
 On a grimpé une pente bien raide la semaine passée. Cette semaine, on va pouvoir récupérer un peu sur un chemin bien plus plat.
-Mais il va quand même falloir avancer...
+Mais il va quand même falloir avancer, avec un objectif général de la semaine: savoir **transformer** les objets d'une liste.
 
-Chacun commencera par finaliser - si besoin - sa version de ESportApp qui lit les fichiers .csv. Cet état fera l'objet d'un commit.
+Mais d'abord, synchronisation ...
 
-- Génération
-- Interface CLI
-  - `--help`
-  - `--folder folder_name`
-  - `--error [strict | soft]`
-- Transformer (Select)
+J'observe des usages du repo du cours très variables: de "aucune activité" pour certains à "plusieurs coups d'avance" pour d'autres. J'ai de la peine à savoir où vous en êtes. Du coup, je vous demande à chacun de créer un fichier `PointDeSituation.md` dans votre dossier perso et de le commit/push.
+
+Quand c'est fait, vous avancez votre ESportApp jusqu'à qu'elle soit capable de lire les fichiers CSV. Pendant ce temps, je consulte vos retours.  
+Si vous avez atteint ce point, attendez les autres en vous attaquant à l'un des [autres exercices](./exos/README.md).
+
+On se synchronise en revoyant ensemble une solution qui importe nos stats à partir de fichiers CSV.
+
+On discute des méthodes de génération (`Range`) et de transformation (`Select`) sur la base la cheatsheet.
+
+- Vous utilisez `Range` et `Random` (bien connu) pour réaliser l'[étape 2](https://github.com/XCarrel/323-Programmation_fonctionnelle/tree/main/exos/fil-rouge/esport/02-recrues-generation).
+
+- Vous utilisez `Select` pour refaire des lignes de CSV à partir de chaque objet et enregistrer les données générées dans vos fichiers CSV ([étape 3](https://github.com/XCarrel/323-Programmation_fonctionnelle/tree/main/exos/fil-rouge/esport/02-recrues-generation)).
+
+- Exercez les fonctions de tri avec l'[exercice 3](./exos/fil-rouge/esport/03-tri-filter/README.md)
+
+N'oubliez pas de semer des petits cailloux blancs le long de votre chemin ...
 
 <hr>
 
@@ -150,4 +161,3 @@ theophile       2026-09-07 10:06     add base avalonia template
 tony            2026-09-07 09:27     Auto-generate files via JDT-Generator
 zidane          2026-09-07 11:27     doc(jdt): Mise à jour du jdt et création du doc
 ```
-
