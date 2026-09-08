@@ -51,6 +51,41 @@ La source ne change pas.
 
 ---
 
+# MapReduce — le Map à l'échelle du web
+
+Un moteur de recherche web doit indexer **50 milliards de pages**. Pour chaque page HTML : extraire le titre, les liens, le score de pertinence.
+
+<v-click>
+
+```
+[page_1.html] ──► Extract() ──► { titre, liens, score }
+[page_2.html] ──► Extract() ──► { titre, liens, score }
+[page_3.html] ──► Extract() ──► { titre, liens, score }
+      ⋮               ⋮                    ⋮
+```
+
+Même fonction appliquée à chaque élément. N pages → N entrées d'index. Les pages sources restent intactes.
+
+</v-click>
+
+<v-click>
+
+Chaque transformation est indépendante — aucune page n'attend le résultat d'une autre. C'est ce qui permet de distribuer le travail sur des milliers de serveurs et d'indexer le web en heures, pas en années. C'est le **Map** de MapReduce.
+
+```csharp
+// LINQ séquentiel — même pattern, un élément à la fois
+pages.Select(page => Extract(page.Html))
+
+// PLINQ — même pattern, parallélisé sur tous les cœurs disponibles
+pages.AsParallel().Select(page => Extract(page.Html))
+```
+
+L'indépendance entre éléments rend la parallélisation possible — LINQ séquentiel ou distribué sur mille machines, c'est la même idée.
+
+</v-click>
+
+---
+
 # Plan
 
 <v-clicks>
@@ -169,6 +204,42 @@ layout: section
 
 ---
 
+# Tuple — regrouper sans créer de classe
+
+```csharp
+// Regrouper deux valeurs sans créer de classe nommée
+(string Name, int Age) pair = ("Paul", 15);
+Console.WriteLine(pair.Name); // → "Paul"
+Console.WriteLine(pair.Age);  // → 15
+```
+
+<v-click>
+
+```csharp
+// Dans Select : le compilateur infère les noms des champs
+var pairs = people.Select(p => (p.Name, p.Age));
+// Type inféré : IEnumerable<(string Name, int Age)>
+
+pairs.First().Name  // → "Paul"  ✓
+pairs.First().Age   // → 15      ✓
+```
+
+</v-click>
+
+<v-click>
+
+⚠ Les noms sont portés par la **variable locale** — si le type est déclaré sans noms, ils disparaissent :
+
+```csharp
+List<(string, int)> list = people.Select(p => (p.Name, p.Age)).ToList();
+//          ↑ pas de noms dans le type          ↑ noms perdus ici
+list[0].Item1  // ← "Paul"   (accès par position seulement)
+```
+
+</v-click>
+
+---
+
 # Structures légères pour les projections
 
 <div class="grid grid-cols-2 gap-6 mt-4">
@@ -180,10 +251,15 @@ var adults = people
     .Select(p => (p.Name, p.Age))
     .Where(t => t.Age >= 18);
 
-adults.First().Name // → "Lucie"
+adults.First().Name // → "Lucie"  ✓ noms disponibles
 ```
 
-⚠ `ToList()` efface les noms : `Item1`, `Item2`…
+```csharp
+// ⚠ Avec un type explicite sans noms, ils disparaissent
+List<(string, int)> list = adults.ToList();
+list[0].Item1 // → "Lucie"  (plus de .Name)
+list[0].Item2 // → 18       (plus de .Age)
+```
 
 </div>
 <v-click>
@@ -205,6 +281,53 @@ Noms préservés sur toute la chaîne.
 </div>
 </v-click>
 </div>
+
+---
+
+# Tuple / classe anonyme — ou classe nommée ?
+
+<div class="grid grid-cols-2 gap-6 mt-4">
+<div>
+
+### Prototypage dans un pipeline
+```csharp
+// Résultat intermédiaire — reste dans la méthode
+var result = people
+    .Select(p => (p.Name, p.Age))
+    .Where(t => t.Age >= 18)
+    .ToList();
+```
+
+Tuple ou classe anonyme : **OK**
+Le type ne sort pas — pas besoin de le nommer.
+
+</div>
+<v-click>
+<div>
+
+### Dès que ça sort du pipeline
+```csharp
+// Retourné par une méthode → nommer le type
+record Adult(string Name, int Age);
+
+IEnumerable<Adult> GetAdults() =>
+    people
+        .Where(p => p.Age >= 18)
+        .Select(p => new Adult(p.Name, p.Age));
+```
+
+Classe ou record : **préférable**
+Lisible, refactorable, utilisable partout.
+
+</div>
+</v-click>
+</div>
+
+<v-click>
+
+> **Règle simple** : si la projection reste dans la méthode → tuple ou anonyme. Si elle en sort → type nommé.
+
+</v-click>
 
 ---
 layout: section

@@ -20,6 +20,7 @@ process.env.VITE_EXTRA_EXTENSIONS = 'docx,pdf,csv,xlsx'
 // Le markdown reste navigable en dehors de VitePress (lien statique vers le fil rouge par défaut).
 function exoLinksPlugin(md: MarkdownIt) {
   md.core.ruler.push('exo-links', (state) => {
+    const inFilRouge = (state.env?.relativePath as string | undefined)?.startsWith('exos/fil-rouge/')
     for (const blockToken of state.tokens) {
       if (blockToken.type !== 'inline' || !blockToken.children) continue
       for (const token of blockToken.children) {
@@ -27,6 +28,10 @@ function exoLinksPlugin(md: MarkdownIt) {
         const href = token.attrGet('href') ?? ''
         // trailing-slash exo links (non fil-rouge) → ajoute README.md pour que VitePress traite le lien avec base
         if (/exos\/(?!fil-rouge)[^/]+\/$/.test(href)) {
+          token.attrSet('href', href + 'README.md')
+        }
+        // relative trailing-slash links inside fil-rouge pages (e.g. esport/README.md → 01-equipe-genericite/)
+        else if (inFilRouge && /^[^/]+\/$/.test(href)) {
           token.attrSet('href', href + 'README.md')
         }
       }
