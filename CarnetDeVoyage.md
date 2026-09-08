@@ -123,7 +123,7 @@ Si vous avez atteint ce point, attendez les autres en vous attaquant à l'un des
 
 On se synchronise en revoyant ensemble une solution qui importe nos stats à partir de fichiers CSV.
 
-On discute des méthodes de génération (`Range`) et de transformation (`Select`) sur la base la cheatsheet.
+On discute des méthodes de génération (`Range` dans la cheatsheet) et de transformation (`Select` dans les [slides](./slides/03-map.md)) .
 
 - Vous utilisez `Range` et `Random` (bien connu) pour réaliser l'[étape 2](https://github.com/XCarrel/323-Programmation_fonctionnelle/tree/main/exos/fil-rouge/esport/02-recrues-generation).
 
