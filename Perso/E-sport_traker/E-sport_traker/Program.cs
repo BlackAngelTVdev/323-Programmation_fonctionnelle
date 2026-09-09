@@ -14,7 +14,6 @@ Console.WriteLine($"Valorant : {valorant.Count} matchs");
 Console.WriteLine($"CS2      : {cs2.Count} matchs");
 Console.WriteLine($"LoL      : {lol.Count} matchs");
 
-// Export des matchs générés vers un CSV
 var exportPath = Path.Combine(Directory.GetCurrentDirectory(), "data", "raphael_matches.csv");
 var lines = raphaelMatches
     .Select(dp => $"{dp.Timestamp:yyyy-MM-dd},{dp.Value.Player},{dp.Value.Map},{dp.Value.StartSide},{dp.Value.Kills},{dp.Value.Deaths},{dp.Value.Assists},{dp.Value.Mvps},{(dp.Value.Won ? "true" : "false")}");

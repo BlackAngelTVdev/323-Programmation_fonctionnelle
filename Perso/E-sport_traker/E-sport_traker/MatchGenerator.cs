@@ -8,8 +8,7 @@ namespace E_sport_traker
         private static readonly string[] Sides = { "CT", "T" };
         private static readonly Random Random = new();
 
-        public static List<DataPoint<Cs2Match>> GenerateCs2Matches(
-            string player, int count, DateTime startDate, int daysBetween = 4)
+        public static List<DataPoint<Cs2Match>> GenerateCs2Matches(string player, int count, DateTime startDate, int daysBetween = 4)
         {
             var matches = new List<DataPoint<Cs2Match>>(count);
             var date = startDate;
