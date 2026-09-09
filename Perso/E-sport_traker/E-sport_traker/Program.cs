@@ -5,6 +5,23 @@ Func<Cs2Match, bool> isValid = m =>
     m.Kills + m.Assists <= 50 &&
     m.Deaths >= 1;
 
+if (args.Contains("--generate"))
+{
+    string target = args[Array.IndexOf(args, "--generate") + 1];
+
+    string[] players = target == "all"
+        ? new[] { "Raphaël", "Kiara", "Dylan", "Noé" }
+        : new[] { target };
+
+    foreach (string player in players)
+    {
+        DataSeries<Cs2Match> series = MatchGenerator.GenerateCs2(player, 20);
+        ExportCs2(series.Filter(isValid), $"{player.ToLower()}_generated.csv");
+        Console.WriteLine($"{player} : données générées et exportées");
+    }
+    return;
+}
+
 DataSeries<ValorantMatch> valorant = DataSeries<ValorantMatch>.FromCsv("data/valorant.csv", ValorantMatch.Parse);
 DataSeries<Cs2Match> cs2 = DataSeries<Cs2Match>.FromCsv("data/cs2.csv", Cs2Match.Parse);
 DataSeries<LolMatch> lol = DataSeries<LolMatch>.FromCsv("data/lol.csv", LolMatch.Parse);
