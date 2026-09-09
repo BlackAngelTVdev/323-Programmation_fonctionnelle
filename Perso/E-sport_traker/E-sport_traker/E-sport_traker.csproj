@@ -12,4 +12,8 @@
     <ProjectReference Include="..\DataLib\DataLib.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\data\*.csv" Link="data\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
