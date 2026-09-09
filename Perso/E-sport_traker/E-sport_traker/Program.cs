@@ -12,7 +12,7 @@ DataSeries<LolMatch> lol = DataSeries<LolMatch>.FromCsv("data/lol.csv", LolMatch
 Console.WriteLine($"Valorant : {valorant.Count} matchs");
 Console.WriteLine($"CS2      : {cs2.Count} matchs");
 Console.WriteLine($"LoL      : {lol.Count} matchs");
-// Total : 75 matchs
+
 
 DataSeries<ValorantMatch> q1 = valorant.FilterByDate(d => d.Month <= 3);
 Console.WriteLine($"Matchs jan–mars : {q1.Count}");
@@ -24,4 +24,16 @@ DataSeries<Cs2Match> raphaelGenerated = MatchGenerator.GenerateCs2("Raphaël", 2
 Console.WriteLine(raphaelGenerated.Count); // 20
 
 DataSeries<Cs2Match> raphaelValid = raphaelGenerated.Filter(isValid);
-Console.WriteLine($"Avant : {raphaelGenerated.Count}, après : {raphaelValid.Count}");
+Console.WriteLine($"Avant : {raphaelGenerated.Count}, après : {raphaelValid.Count}");
+
+ExportCs2(raphaelValid, "raphael_generated.csv");
+
+static void ExportCs2(DataSeries<Cs2Match> matches, string path)
+{
+    string header = "date,player,map,start_side,kills,deaths,assists,mvps,won";
+    IEnumerable<string> lines = matches.DataPoints.Select(dp =>
+        $"{dp.Timestamp:yyyy-MM-dd},{dp.Value.Player},{dp.Value.Map},{dp.Value.StartSide}," +
+        $"{dp.Value.Kills},{dp.Value.Deaths},{dp.Value.Assists},{dp.Value.Mvps},{dp.Value.Won.ToString().ToLower()}"
+    );
+    File.WriteAllLines(path, lines.Prepend(header));
+}
