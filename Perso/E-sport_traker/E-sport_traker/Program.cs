@@ -16,7 +16,7 @@ if (args.Contains("--generate"))
     foreach (string player in players)
     {
         DataSeries<Cs2Match> series = MatchGenerator.GenerateCs2(player, 20);
-        ExportCs2(series.Filter(isValid), $"{player.ToLower()}_generated.csv");
+        ExportCs2(series.Filter(isValid), $"./data/{player.ToLower()}_generated.csv");
         Console.WriteLine($"{player} : données générées et exportées");
     }
     return;
@@ -43,7 +43,7 @@ Console.WriteLine(raphaelGenerated.Count); // 20
 DataSeries<Cs2Match> raphaelValid = raphaelGenerated.Filter(isValid);
 Console.WriteLine($"Avant : {raphaelGenerated.Count}, après : {raphaelValid.Count}");
 
-ExportCs2(raphaelValid, "raphael_generated.csv");
+ExportCs2(raphaelValid, "./data/raphael_generated.csv");
 
 static void ExportCs2(DataSeries<Cs2Match> matches, string path)
 {
