@@ -21,16 +21,15 @@ namespace E_sport_traker
         }
 
         
-        public static DataPoint<LolMatch> Parse(string[] cols) =>
-            new DataPoint<LolMatch>(
-                DateTime.Parse(cols[0]),
-                new LolMatch(cols[1],
-                    cols[2],
-                    int.Parse(cols[4]),
-                    int.Parse(cols[5]),
-                    int.Parse(cols[6]),
-                    int.Parse(cols[7]),
-                    int.Parse(cols[8]),
-                    bool.Parse(cols[9])));
+        public static LolMatch Parse(string[] cols) =>
+            new LolMatch(
+                cols[1],
+                cols[2],
+                int.Parse(cols[4]),
+                int.Parse(cols[5]),
+                int.Parse(cols[6]),
+                int.Parse(cols[7]),
+                int.Parse(cols[8]),
+                bool.Parse(cols[9]));
     }
 }

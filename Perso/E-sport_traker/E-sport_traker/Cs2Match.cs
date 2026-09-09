@@ -20,16 +20,15 @@ namespace E_sport_traker
             Deaths = deaths; Assists = assists; Mvps = mvps; Won = won;
         }
 
-        public static DataPoint<Cs2Match> Parse(string[] cols) =>
-            new DataPoint<Cs2Match>(
-                DateTime.Parse(cols[0]),
-                new Cs2Match(cols[1],
-                    cols[2],
-                    cols[3],
-                    int.Parse(cols[4]),
-                    int.Parse(cols[5]),
-                    int.Parse(cols[6]),
-                    int.Parse(cols[7]),
-                    bool.Parse(cols[8])));
+        public static Cs2Match Parse(string[] cols) =>
+            new Cs2Match(
+                cols[1],
+                cols[2],
+                cols[3],
+                int.Parse(cols[4]),
+                int.Parse(cols[5]),
+                int.Parse(cols[6]),
+                int.Parse(cols[7]),
+                bool.Parse(cols[8]));
     }
 }

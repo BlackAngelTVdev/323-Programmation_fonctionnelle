@@ -1,22 +1,17 @@
 using DataLib;
 using E_sport_traker;
 
-string dataFolder = Path.Combine(AppContext.BaseDirectory, "data");
-List<DataPoint<Cs2Match>> raphaelMatches = MatchGenerator.GenerateCs2Matches("Raphaël", 20, new DateTime(2024, 3, 8));
-
-
-DataSeries<DataPoint<ValorantMatch>> valorant = DataSeries<DataPoint<ValorantMatch>>.LoadCsv(Path.Combine(dataFolder, "valorant.csv"), ValorantMatch.Parse);
-DataSeries<DataPoint<Cs2Match>> cs2 = DataSeries<DataPoint<Cs2Match>>.LoadCsv(Path.Combine(dataFolder, "cs2.csv"), Cs2Match.Parse);
-DataSeries<DataPoint<LolMatch>> lol = DataSeries<DataPoint<LolMatch>>.LoadCsv(Path.Combine(dataFolder, "lol.csv"), LolMatch.Parse);
-
+DataSeries<ValorantMatch> valorant = DataSeries<ValorantMatch>.FromCsv("data/valorant.csv", ValorantMatch.Parse);
+DataSeries<Cs2Match> cs2 = DataSeries<Cs2Match>.FromCsv("data/cs2.csv", Cs2Match.Parse);
+DataSeries<LolMatch> lol = DataSeries<LolMatch>.FromCsv("data/lol.csv", LolMatch.Parse);
 
 Console.WriteLine($"Valorant : {valorant.Count} matchs");
 Console.WriteLine($"CS2      : {cs2.Count} matchs");
 Console.WriteLine($"LoL      : {lol.Count} matchs");
+// Total : 75 matchs
 
-string exportPath = Path.Combine(Directory.GetCurrentDirectory(), "data", "raphael_matches.csv");
-IEnumerable<string> lines = raphaelMatches.Select(dp => $"{dp.Timestamp:yyyy-MM-dd},{dp.Value.Player},{dp.Value.Map},{dp.Value.StartSide},{dp.Value.Kills},{dp.Value.Deaths},{dp.Value.Assists},{dp.Value.Mvps},{(dp.Value.Won ? "true" : "false")}");
+DataSeries<ValorantMatch> q1 = valorant.FilterByDate(d => d.Month <= 3);
+Console.WriteLine($"Matchs jan–mars : {q1.Count}");
 
-File.WriteAllLines(exportPath, new[] { "date,player,map,start_side,kills,deaths,assists,mvps,won" }.Concat(lines));
-Console.WriteLine($"{raphaelMatches.Count} matchs exportés dans {exportPath}");
-
+DataSeries<ValorantMatch> q1Wins = valorant.FilterByDate(d => d.Month <= 3).Filter(m => m.Won);
+Console.WriteLine($"Victoires jan–mars : {q1Wins.Count}");

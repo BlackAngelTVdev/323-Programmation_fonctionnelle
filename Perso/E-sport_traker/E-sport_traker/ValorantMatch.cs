@@ -20,17 +20,15 @@ namespace E_sport_traker
             Assists = assists; Score = score; Rounds = rounds; Won = won;
         }
 
-        public static DataPoint<ValorantMatch> Parse(string[] cols) =>
-            new DataPoint<ValorantMatch>(
-                DateTime.Parse(cols[0]),
-                new ValorantMatch(
-                    cols[1], 
-                    cols[2], 
-                    int.Parse(cols[3]), 
-                    int.Parse(cols[4]),
-                    int.Parse(cols[5]),
-                    int.Parse(cols[6]),
-                    int.Parse(cols[7]),
-                    bool.Parse(cols[8])));
+        public static ValorantMatch Parse(string[] cols) =>
+            new ValorantMatch(
+                cols[1],
+                cols[2],
+                int.Parse(cols[3]),
+                int.Parse(cols[4]),
+                int.Parse(cols[5]),
+                int.Parse(cols[6]),
+                int.Parse(cols[7]),
+                bool.Parse(cols[8]));
     }
 }
