@@ -4,32 +4,28 @@ namespace E_sport_traker
 {
     public static class MatchGenerator
     {
-        private static readonly string[] Maps = { "Dust2", "Mirage", "Inferno", "Nuke", "Ancient", "Anubis" };
-        private static readonly string[] Sides = { "CT", "T" };
-        private static readonly Random Random = new();
-
-        public static List<DataPoint<Cs2Match>> GenerateCs2Matches(string player, int count, DateTime startDate, int daysBetween = 4)
+        public static DataSeries<Cs2Match> GenerateCs2(string player, int count, int seed = 42)
         {
-            var matches = new List<DataPoint<Cs2Match>>(count);
-            var date = startDate;
+            var rng = new Random(seed);
+            var maps = new[] { "Dust2", "Mirage", "Inferno", "Nuke", "Ancient" };
+            var sides = new[] { "CT", "T" };
+            var start = new DateTime(2023, 9, 1); // début de la pré-saison
 
-            for (int i = 0; i < count; i++)
-            {
-                var match = new Cs2Match(
-                    player,
-                    Maps[Random.Next(Maps.Length)],
-                    Sides[Random.Next(Sides.Length)],
-                    Random.Next(14, 27),   // kills
-                    Random.Next(6, 14),    // deaths
-                    Random.Next(1, 6),     // assists
-                    Random.Next(0, 5),     // mvps
-                    Random.NextDouble() < 0.6); // won
-
-                matches.Add(new DataPoint<Cs2Match>(date, match));
-                date = date.AddDays(daysBetween + Random.Next(0, 3));
-            }
-
-            return matches;
+            return DataSeries<Cs2Match>.From(
+                Enumerable.Range(1, count)
+                    .Select(i => new DataPoint<Cs2Match>(
+                        start.AddDays(i),
+                        new Cs2Match(
+                            player,
+                            maps[rng.Next(maps.Length)],
+                            sides[rng.Next(2)],
+                            rng.Next(10, 28),   // kills
+                            rng.Next(6, 18),    // deaths
+                            rng.Next(0, 8),     // assists
+                            rng.Next(0, 5),     // mvps
+                            rng.Next(2) == 0    // won
+                        )))
+            );
         }
     }
 }
