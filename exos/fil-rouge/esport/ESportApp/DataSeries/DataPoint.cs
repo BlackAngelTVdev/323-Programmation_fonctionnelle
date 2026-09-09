@@ -16,6 +16,11 @@ namespace DataSeries
             Timestamp = timestamp;
             Value = value;
         }
+
+        public override string ToString()
+        {
+            return $"[{Timestamp}] {Value}";
+        }
     }
 
 }

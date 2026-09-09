@@ -189,6 +189,13 @@ Les classes `ValorantMatch`, `Cs2Match` et `LolMatch` viennent de l'exercice 01.
 
 </details>
 
+> **`DataSeries<T>.Count`** — cette propriété sera implémentée dans un chapitre ultérieur.
+> Pour l'instant, l'ajouter telle quelle dans `DataSeries.cs` :
+
+```csharp
+public int Count => _data.Count();
+```
+
 Charger les trois fichiers et vérifier le total :
 
 ```csharp

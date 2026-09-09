@@ -29,5 +29,10 @@ namespace DataSeries
             Mvps = mvps;
             Won = won;
         }
+
+        public override string ToString()
+        {
+            return $"Player: {Player}, Map: {Map}, Start Side: {StartSide}, Kills: {Kills}, Deaths: {Deaths}, Assists: {Assists}, MVPs: {Mvps}, Won: {Won}";
+        }
     }
 }

@@ -17,6 +17,11 @@ namespace DataSeries
             return new DataSerie<T>(source);
         }
 
+        // Créer une datasérie de type générique à partir d'un fichier CSV.
+        // Comme le format du fichier est spécifique au type, on ne sait pas
+        // comment le parser. C'est l'appelant de la méthode qui doit nous donner
+        // le bon outil, sous la forme de la fonction `parser`.
+
         public static DataSerie<T> FromCsv(string filename, Func<string[], T> parser)
         {
             List<T> data = new List<T>();
@@ -36,5 +41,10 @@ namespace DataSeries
         
         public int Count => _data.Count();
         public IEnumerable<T> Values => _data;
+
+        public override string ToString()
+        {
+            return $"DataSerie<{typeof(T).Name}>: {Count} points: {Environment.NewLine}{String.Join(Environment.NewLine,_data.Select(s => s).ToArray())}";
+        }
     }
 }

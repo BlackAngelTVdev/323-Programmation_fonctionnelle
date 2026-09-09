@@ -29,5 +29,9 @@ namespace ESportApp
         public int VisionScore { get; }
         public bool Won { get; }
 
+        public override string ToString()
+        {
+            return $"Player: {Player}, Champion: {Champion}, Kills: {Kills}, Deaths: {Deaths}, Assists: {Assists}, CS: {Cs}, Vision Score: {VisionScore}, Won: {Won}";
+        }
     }
 }
