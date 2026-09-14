@@ -163,12 +163,12 @@ tony            2026-09-07 09:27     Auto-generate files via JDT-Generator
 zidane          2026-09-07 11:27     doc(jdt): Mise à jour du jdt et création du doc
 ```
 
-Discussion entre guillemets, car personne ne réagit quand je dis que je ne trouve pas cela normal. Personne ne réagit non plus quand je demande si quelqu'un trouve que je suis trop exigeant.
+"Discussion", entre guillemets, parce que ça ne va que dans un sens: personne ne réagit quand je dis que je ne trouve pas cela normal. Personne ne réagit non plus quand je demande si quelqu'un trouve que je suis trop exigeant.
 
-Malheureusement, je dois constater dans l'après-midi que le message n'a toujours pas passé auprès de trois élèves.
+Malheureusement, je dois constater dans l'après-midi que le message n'a toujours pas passé auprès de certains (3) élèves.
 
 J'ai ajouté des remarques dans MarketPlace.  
 Ceux qui n'en n'ont pas ou peu = bonne nouvelle, ça se passe bien.  
-Les autres peuvent - s'ils le désirent - réagir.
+Les autres peuvent - s'ils le désirent - réagir à la suite de mes commentaires.
 
-Un constat général : maintenant que le code a commencé, je dois pouvoir l'exécuter. Plusieurs ont choisi de partir sur Avalonia et je n'ai pas suffisamment d'informations à ma disposition pour savoir comment faire.
+Un constat général : maintenant que le code a commencé, je veux pouvoir l'exécuter. Plusieurs ont choisi de partir sur Avalonia et je n'ai pas suffisamment d'informations à ma disposition pour savoir comment faire.
