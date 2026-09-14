@@ -172,3 +172,6 @@ Ceux qui n'en n'ont pas ou peu = bonne nouvelle, ça se passe bien.
 Les autres peuvent - s'ils le désirent - réagir à la suite de mes commentaires.
 
 Un constat général : maintenant que le code a commencé, je veux pouvoir l'exécuter. Plusieurs ont choisi de partir sur Avalonia et je n'ai pas suffisamment d'informations à ma disposition pour savoir comment faire.
+
+### Mercredi 16 septembre
+
