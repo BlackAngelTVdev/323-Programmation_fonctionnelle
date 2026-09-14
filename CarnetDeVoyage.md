@@ -142,9 +142,9 @@ Au final, une petite moitié de la classe a commencé à faire le traitement d'e
 
 <hr>
 
-## Semaine 38 (14 septembre)
+## Semaine 38
 
-### <a name="s38lundi"></a>Lundi
+### Lundi 14 septembre
 
 "Discussion" au sujet de l'absence de mise à jour du journal de travail suite au constat suivant:
 
