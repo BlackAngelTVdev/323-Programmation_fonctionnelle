@@ -144,16 +144,10 @@ Au final, une petite moitié de la classe a commencé à faire le traitement d'e
 
 ## Semaine 38 (14 septembre)
 
-### Lundi
+### <a name="s38lundi"></a>Lundi
 
-Il faut qu'on discute, parce que je fais un constat qui me dérange et que je ne trouve pas les bonnes raisons qui pourraient l'expliquer.  
-Peut-être que quelque chose m'échappe.
+"Discussion" au sujet de l'absence de mise à jour du journal de travail suite au constat suivant:
 
-On travaille 3 heures ensemble le lundi matin, sur un projet dans lequel vous devez tenir un journal de travail et appliquer de bonnes pratiques en matière de contrôle de version.
-
-Je m'attends donc à ce que dans chacun de vos repos je trouve un dernier commit fait aux alentours de 11h25, qui serait nommé "chore(jdt): Mettre à jour avec les activités de ce matin".
-
-Or voici ce que je vois:
 ```
 albert          2026-09-04 10:26     feat(readme): ajout du rapport
 damienc         2026-09-07 09:26     feat(P_FUN): Ajout structure du projet
@@ -168,3 +162,13 @@ theophile       2026-09-07 10:06     add base avalonia template
 tony            2026-09-07 09:27     Auto-generate files via JDT-Generator
 zidane          2026-09-07 11:27     doc(jdt): Mise à jour du jdt et création du doc
 ```
+
+Discussion entre guillemets, car personne ne réagit quand je dis que je ne trouve pas cela normal. Personne ne réagit non plus quand je demande si quelqu'un trouve que je suis trop exigeant.
+
+Malheureusement, je dois constater dans l'après-midi que le message n'a toujours pas passé auprès de trois élèves.
+
+J'ai ajouté des remarques dans MarketPlace.  
+Ceux qui n'en n'ont pas ou peu = bonne nouvelle, ça se passe bien.  
+Les autres peuvent - s'ils le désirent - réagir.
+
+Un constat général : maintenant que le code a commencé, je dois pouvoir l'exécuter. Plusieurs ont choisi de partir sur Avalonia et je n'ai pas suffisamment d'informations à ma disposition pour savoir comment faire.
