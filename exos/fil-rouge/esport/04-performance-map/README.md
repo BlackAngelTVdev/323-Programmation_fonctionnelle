@@ -23,7 +23,7 @@ Normaliser le KDA permet ensuite de le comparer à des séries d'autres natures
 ## Concept FP : Map = transformer sans modifier
 
 `.Transform()` applique une fonction à **chaque élément** et retourne une **nouvelle série**.
-La source n'est jamais modifiée — même principe que `.Filter()`.
+La source n'est jamais modifiée.
 
 ```
 [m1, m2, m3] → Transform(f) → [f(m1), f(m2), f(m3)]
@@ -33,27 +33,33 @@ La source n'est jamais modifiée — même principe que `.Filter()`.
 
 ## 4.1 — Calculer les KDA (ou tout autre indicateur) `.Transform(mapper)`
 
-Nous voulons notre librairie `DataSeries` offre la possibilité d'appliquer une transformation à tous les éléments d'une série, tout en conservant leurs timestamps.  
-Nous tenons au fait que la librairie reste générale (générique!) pour pouvoir être utilisée dans des domaines d'application différents les uns des autres.  
-Nous devons donc être capable de faire la transformation de ... n'importe quoi en ... n'importe quoi !  
+Nous voulons que notre librairie `DataSeries` offre la possibilité d'appliquer une transformation à tous les éléments d'une série, tout en conservant leurs timestamps.
+Nous tenons au fait que la librairie reste générale (générique!) pour pouvoir être utilisée dans des domaines d'application différents les uns des autres.
+Nous devons donc être capable de faire la transformation de ... n'importe quoi en ... n'importe quoi !
 C'est mission impossible! Sauf si on nous fournit l'outil (la fonction) qui sait faire cette transformation.
 
 **Avant de coder :**
 
 <details>
 <summary>Quelle méthode d'ordre supérieur de LINQ applique une fonction à chaque élément ?</summary>
+
 `.Select(mapper)`
+
 </details>
 <details>
 <summary>De quel type partons-nous et quel type obtient-on quand on s'intéresse au KDA ?</summary>
-`ValorantMatch` -> `double`
-`Cs2Match` -> `double`
+
+`ValorantMatch` -> `double`  
+`Cs2Match` -> `double`  
 `LolMatch` -> `double`
+
 </details>
 <details>
 <summary>De quelle(s) manière(s) peut-on définir le mapper ?</summary>
 Avec une lambda ou une fonction nommée
 </details>
+
+Avec les réponses en tête, on peut s'attaquer à
 
 ```csharp
 public DataSeries<TResult> Transform<TResult>(Func<T, TResult> mapper)
@@ -63,8 +69,8 @@ public DataSeries<TResult> Transform<TResult>(Func<T, TResult> mapper)
 }
 ```
 
-Allez-y et Calculez le KDA de tous les matches Valorant.  
-Chainezça avec d'autres fonctions pour obtenir le KDA de tous les matches de Léa, de tous les matches gagnés, ...
+Allez-y et Calculez le KDA de tous les matches Valorant.
+Chainez ça avec d'autres fonctions pour obtenir le KDA de tous les matches de Léa, de tous les matches gagnés, ...
 
 Reproduire pour CS2 (Raphaël, Kiara) et LoL (Noé).
 
@@ -79,8 +85,8 @@ Reproduire pour CS2 (Raphaël, Kiara) et LoL (Noé).
 
 ## 4.2 — Comparer entre différents jeux avec `.Normalize()`
 
-On ne peut pas comparer des pommes et des poires, c'est bien connu.  
-Tout comme on ne peut pas comparer les stats de Valorant avec celles de Cs2 ou de Lol. Une valeur qui représent un super KDA dans Valorant peut paraître ridicule dans Cs2.  
+On ne peut pas comparer des pommes et des poires, c'est bien connu.
+Tout comme on ne peut pas comparer les stats de Valorant avec celles de Cs2 ou de Lol. Une valeur qui représent un super KDA dans Valorant peut paraître ridicule dans Cs2.
 On veut donc que notre librairie soit capable de **normaliser** une série.
 
 **Avant de coder :**
@@ -92,9 +98,14 @@ Faire en sorte que la plus grande valeur de la série soit 1 et la plus petite 0
 
 <details>
 <summary>Quelle formule permet de ramener n'importe quelle valeur dans `[0, 1]` ?</summary>
+
 `(valeur - min) / (max - min)` — le minimum devient 0, le maximum devient 1.
+
 Cas particulier : si `max == min` (toutes les valeurs identiques), retourner 0 pour éviter une division par zéro.
+
 </details>
+
+On est prêts pour coder:
 
 ```csharp
 // Evalue chaque objet de la série avec l'outil (fonction) d'évaluation fourni,
@@ -124,10 +135,19 @@ var kdaNoeNorm     = kdaNoe.Normalize(...);
 
 ## 4.3 — Lisser une courbe avec `.Smooth(windowSize)` et la closure
 
-**Avant de coder :** la moyenne glissante d'indice `i` avec une fenêtre de taille `w`
-utilise les éléments aux indices `[i-w+1 .. i]`. Comment générer tous les indices avec LINQ ?
+**Avant de coder :**
+
+> la moyenne glissante d'indice `i` avec une fenêtre de taille `w` utilise les éléments aux indices `[i-w+1 .. i]`.
 
 <details>
+<summary>Comment générer tous les indices pertinents avec LINQ ?</summary>
+
+`Range(w, \_data.Count()-w)`
+
+<details>
+
+Encore un
+
 <summary>Indice sur la structure</summary>
 Vous aurez certainement recours à :
 - `Enumerable.Range(x,y)`
@@ -136,6 +156,8 @@ Vous aurez certainement recours à :
 - `Average()`
 Allez les voir dans la cheatsheet.
 </details>
+
+Et c'est à vous de jouer...
 
 Observer la closure :
 
