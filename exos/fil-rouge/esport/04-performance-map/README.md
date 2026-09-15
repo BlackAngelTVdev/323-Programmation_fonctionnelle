@@ -142,19 +142,25 @@ var kdaNoeNorm     = kdaNoe.Normalize(...);
 <details>
 <summary>Comment générer tous les indices pertinents avec LINQ ?</summary>
 
-`Range(w, \_data.Count()-w)`
+`Range(w, _data.Count()-w)`
 
-<details>
+</details>
 
 Encore un
 
+<details>
 <summary>Indice sur la structure</summary>
 Vous aurez certainement recours à :
-- `Enumerable.Range(x,y)`
-- `Skip(n)`
-- `Take(n)`
-- `Average()`
+
+```
+Enumerable.Range(x,y)
+Skip(n)
+Take(n)
+Average()
+```
+
 Allez les voir dans la cheatsheet.
+
 </details>
 
 Et c'est à vous de jouer...
