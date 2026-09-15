@@ -108,7 +108,7 @@ Mais tout le monde a une story en cours de réalisation.
 
 ### Mercredi
 
-On a fait le checkpoint #2 sur les fonctions d'ordre supérieur et des première méthodes d'extension LinQ.  
+On a fait le checkpoint #2 sur les fonctions d'ordre supérieur et des première méthodes d'extension LinQ.
 
 On a grimpé une pente bien raide la semaine passée. Cette semaine, on n'a pas abordé de sujet théorique fondamental.
 L'objectif général de la semaine: savoir **transformer** les objets d'une liste.
@@ -137,7 +137,7 @@ La mission donnée était:
   - feat(ESportApp): détecter les outliers
   - feat(ESportApp): traiter les cas d'erreurs
   - feat(ESportApp): ajouter les commandes CLI pour le traitement des erreurs
- 
+
 Au final, une petite moitié de la classe a commencé à faire le traitement d'erreur.  
 À moins d'évaluer cela un petit peu plus finement à partir des commits effectués
 
@@ -176,3 +176,51 @@ Un constat général : maintenant que le code a commencé, je veux pouvoir l'ex�
 
 ### Mercredi 16 septembre
 
+On commence par faire le checkpoint #3
+
+Ensuite on revient sur les exercices proposés la semaine passée:
+
+- L'exercice 2 porte sur la génération et la transformation
+  - 2.0 `DataSeries<T>` comme vraie série temporelle
+  - 2.1 Parser les fichiers CSV
+  - 2.1 Générer des matches (Range)
+  - 2.2 Sauver en CSV (Select)
+  - 2.3 CLI pour demander la génération
+- L'exercice 3 porte sur le filtrage
+  - 3.1 Détecter les erreurs (Where)
+  - 3.2 Supprimer les erreurs (Where)
+  - 3.3 CLI pour définir le comportement face aux erreurs
+
+Voici la synthèse que je fais sur la base des commits que je vois dans vos repos et des points de situation que vous avez rédigés :
+
+|           | 2.1 | 2.2 | 2.3 | 2.4 | 3.1 | 3.2 | 3.3 |
+| --------- | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| albert    | OK  |     |     |     |     |     |     |
+| damienc   | OK  | OK  | OK  |     |     |     |     |
+| damienr   | OK  | OK  | OK  | OK  |     |     |     |
+| erdem     | OK  | OK  | OK  |     |     |     |     |
+| gianmarco | OK  | OK  | OK  |     |     |     |     |
+| gillian   | OK  | OK  |     |     |     |     |     |
+| kiril     | OK  | OK  | OK  |     |     |     |     |
+| sacha     | OK  | OK  |     | OK  |     |     |     |
+| snehan    | OK  | OK  | OK  |     |     |     |     |
+| theophile | OK  | OK  |     | OK  |     |     |     |
+| tony      | OK  | OK  | OK  | OK  |     |     |     |
+| zidane    | OK  | OK  |     |     |     |     |     |
+
+On se donne une heure (jusqu'à la pause) pour finir ces exercices.
+
+Mais avant cela, la moitié d'entre vous devront défaire quelques changements demandés précédemment 😤.  
+En effet, au début de l'étape 2, nous avions voulu intégrer un Timestamp pour avoir de vraies Timeseries. Nous avions passé de `private readonly IEnumerable<T> _data;` à `private readonly IEnumerable<DataPoint<T>> _data;`. Cela va introduire un degré de complexité supplémentaire significatif pour la suite. Si vous aviez fait ce changement:
+
+- Revenez à `private readonly IEnumerable<T> _data;`
+- Ajoutez une propriété `public DateTime Timestamp { get; }` aux trois types de matches
+- Corrigez toutes les erreurs que cela cause
+
+Et ensuite on continue...
+
+Faites apparaître le numéro de l'étape dans le nom de vos commits, p.ex.: `feat(ESportApp): Réaliser l'étape 2.2 (Sauver en CSV)`
+
+Après la pause on va consolider le concept de transformation en générant des **indicateurs** à partir de nos données avec l'[exercice 4](./exos/fil-rouge/esport/04-performance-map/)
+
+Ceux qui arrivent au bout de l'exercice peuvent encore approfondir avec l'étape bonus et/ou les exercices [Market Is Back](./exos/mib-map/README.md) ou [Rando](./exos/rando/README.md)
