@@ -4,8 +4,8 @@
 
 ## Concepts théoriques
 
-- [Thématique 02 — Filter et fonctions d'ordre supérieur](../../../../thematiques/02-filter-fonctions-sup.md)
-- [Fonctions d'ordre supérieur](../../../../supports/source/02a-fonctions-sup.md)
+- [Thématique 02 — Filter et fonctions d&#39;ordre supérieur](../../../../thematiques/02-filter-fonctions-sup.md)
+- [Fonctions d&#39;ordre supérieur](../../../../supports/source/02a-fonctions-sup.md)
 - [Closures](../../../../supports/source/02a-fonctions-sup.md#closures-captures-de-variables)
 - [Évaluation paresseuse](../../../../supports/source/02b-filter.md#evaluation-paresseuse-deferred-execution)
 
@@ -18,7 +18,7 @@ doit simuler des données plausibles pour compléter l'historique.
 
 ---
 
-## Prérequis — `DataSeries<T>` comme vraie série temporelle
+## 2.0. Prérequis — `DataSeries<T>` comme vraie série temporelle
 
 > À faire **avant** l'étape 1 si l'exercice 01 a été réalisé sans `DataPoint<T>`.
 
@@ -77,9 +77,9 @@ new DataPoint<ValorantMatch>(new DateTime(2024, 1, 15), new ValorantMatch("Léa"
 
 ---
 
-## Étape 1 — `DataSeries<T>.FromCsv` (import fichier)
+## 2.1. — `DataSeries<T>.FromCsv` (import fichier)
 
-Première **fonction d'ordre supérieur** concrète du cours : une méthode qui reçoit une *fonction*
+Première **fonction d'ordre supérieur** concrète du cours : une méthode qui reçoit une _fonction_
 en paramètre.
 
 **Avant de coder :** `FromCsv` doit fonctionner pour Valorant, CS2 et LoL.
@@ -233,7 +233,7 @@ public DataSeries<T> FilterByDate(Func<DateTime, bool> predicate)
 
 ---
 
-## Étape 2 — Générer 20 matchs CS2 pour Raphaël
+## 2.2 — Générer 20 matchs CS2 pour Raphaël
 
 `Enumerable.Range` génère une séquence d'entiers. Combiné avec `Select`, il devient un
 **générateur fonctionnel** — l'équivalent d'une boucle for, mais déclaratif :
@@ -290,7 +290,7 @@ public static class MatchGenerator
 }
 ```
 
-> La lambda passée à `Select` utilise `rng`, `maps`, `sides` et `start` déclarés *en dehors* d'elle :
+> La lambda passée à `Select` utilise `rng`, `maps`, `sides` et `start` déclarés _en dehors_ d'elle :
 > c'est une **closure** — la fonction capture les variables de son environnement.
 > → [Closures](../../../../supports/source/02a-fonctions-sup.md#closures-captures-de-variables)
 
@@ -367,7 +367,7 @@ C'est le comportement attendu : des contraintes métier éliminent des cas impos
 
 ---
 
-## Étape 3 — Exporter en CSV
+## 2.3 — Exporter en CSV
 
 **Avant de coder :** quel format doit avoir le CSV exporté pour être compatible avec `FromCsv`
 de l'étape 1 ? Regarder l'en-tête de `data/cs2.csv`.
@@ -418,7 +418,7 @@ similaires adaptées à chaque format CSV.
 
 ---
 
-## Étape 4 — Interface CLI
+## 2.4 — Interface CLI
 
 Ajouter le flag `--generate <joueur|all>` pour déclencher la génération depuis la ligne de commande.
 

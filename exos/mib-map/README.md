@@ -1,7 +1,9 @@
 # Le retour du marché
+
 À partir des données de [l’exercice marché](../marché/), réaliser les opérations suivantes:
 
 > Vous êtes libre d’utiliser la forme que vous voulez pour les données mais le but est d’aller vite... Personnellement, je suis parti de
+
 ```csharp
 List<Product> products = new List<Product>
 {
@@ -17,16 +19,19 @@ List<Product> products = new List<Product>
     //...
 }
 ```
+
 ## Échauffement : transformation "simples"
 
 ### 1. Chiffre d’affaire international anonyme
+
 En [transformant](../../supports/source/03-Map.md#je-ne-veux-pas-transformer-je-veux-juste-sélectionner) la liste initiale en une liste contenant:
 
 - Les 3 premières lettres du producteur suivies de "..." suivis de la dernière lettre du nom (Dumont --> Dum...t) [pseudo-anonymisation]
 - Le nom de l’aliment en anglais [dictionnaire disponible ici](./i18n.cs)
-- Le chiffre d’affaire maximum possible de la journée avec cet aliment (CA = Quantity * PricePerUnit)
+- Le chiffre d’affaire maximum possible de la journée avec cet aliment (CA = Quantity \* PricePerUnit)
 
 #### Livrable 1
+
 Afficher le résultat:
 
 | Seller  | Product | CA  |
@@ -35,6 +40,7 @@ Afficher le résultat:
 |         |         |     |
 
 #### Livrable 2
+
 Exporter le résultat dans un fichier CSV:
 
 ```csv
@@ -45,27 +51,30 @@ Dum...t,Nuts,110
 ## Dashboard
 
 ### Calcul
+
 Certaines valeurs pourraient faciliter le pilotage du marché.
 
 Transformer la liste pour obtenir :
-- *Anonymisation renforcée* : Premier caractère + nombre de caractères + dernier caractère (ex: "Dumont" → "D5t")
-- *Catégorisation automatique* : Classer chaque produit selon sa quantité
+
+- _Anonymisation renforcée_ : Premier caractère + nombre de caractères + dernier caractère (ex: "Dumont" → "D5t")
+- _Catégorisation automatique_ : Classer chaque produit selon sa quantité
   - "Stock faible" (< 10)
-  - "Stock normal" (10-15) 
+  - "Stock normal" (10-15)
   - "Stock élevé" (> 15)
-- *Valeur unitaire ajustée* : Prix majoré de 15% si stock faible, 5% si normal, prix normal si élevé
-- *Indicateur de rentabilité* : "Premium" si CA > 100, "Standard" sinon
+- _Valeur unitaire ajustée_ : Prix majoré de 15% si stock faible, 5% si normal, prix normal si élevé
+- _Indicateur de rentabilité_ : "Premium" si CA > 100, "Standard" sinon
 
 ### Export
+
 Pour une meilleure interopérabilité, exporter maintenant ces résultats au format json:
 
-``` json
+```json
 [
 	{
 		"producer":"",
 		...
 	}...
-	
+
 ]
 ```
 
@@ -75,7 +84,7 @@ Le dashboard sera probablement vendu à des millions d’exemplaires, il faut pe
 
 Pour en avoir le coeur net, il faut comparer les différentes options possibles (lambda, méthodes, ...). Voici un squelette pour calculer des performances:
 
-``` csharp
+```csharp
 using System.Diagnostics;
 
 static (long time, long memory) MesurePerf(Action action, int iterations = 1000)
@@ -101,6 +110,7 @@ static (long time, long memory) MesurePerf(Action action, int iterations = 1000)
 ```
 
 Mesurer et comparer les performances de différentes approche :
+
 - Select simple
 - Select avec méthodes externes
 - Select avec expressions lambda

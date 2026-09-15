@@ -15,7 +15,7 @@ Avant toute analyse, il faut valider que les contraintes sont respectées dans l
 
 <hr>
 
-## Étape 1 — Implémenter `.Outliers(predicate)`
+## 3.1 — Détecter les erreurs en implémentant `.Outliers(predicate)`
 
 On appelle "Outlier" une valeur aberrante, impossible dans une série. Si on a par exemple une série de mesures de la température du lac, la valeur "234" est un outlier.  
 Le but de cette méthode est de montrer les outliers. On lui passe une fonction qui détermine si une valeur est "outlier" ou pas.
@@ -45,12 +45,12 @@ Console.WriteLine(baaad.Count);     // sous-ensemble
 
 <hr>
 
-## Étape 2 — Implémenter `.Sanitize(predicate)`
+## 3.2 — Supprimer les erreurs en implémentant `.Sanitize(predicate)`
 
 Cette méthode nettoie une série en enlevant les outliers.
 
 Il y a plusieurs manières de réaliser `Sanitize`. Comparez vos solutions entre vous.  
-Quelqu'un a-t-il utilisé `Outliers` pour coder `Sanitize` ? 
+Quelqu'un a-t-il utilisé `Outliers` pour coder `Sanitize` ?
 
 Appliquer à chaque jeu pour éliminer les valeurs impossibles :
 
@@ -76,9 +76,10 @@ lol.Sanitize(m =>
     m.Cs      < 0
 );
 ```
+
 <hr>
 
-## Étape 3 — Interface CLI
+## 3.3 — CLI pour définir le comportement face aux erreurs
 
 Ajouter les flags `--player <nom>` et `--filter wins|losses|all`.
 Ces deux flags se combinent avec `--game` introduit en exercice 01.
@@ -93,7 +94,7 @@ les prédicats dans un **dictionnaire** ? Que faut-il faire pour ajouter un crit
 <details>
 <summary>Indice — dispatch fonctionnel</summary>
 
-Une fonction est une valeur : elle peut être la *valeur* d'un dictionnaire.
+Une fonction est une valeur : elle peut être la _valeur_ d'un dictionnaire.
 `Dictionary<string, Func<ValorantMatch, bool>>` associe chaque mode CLI à son prédicat —
 le if/else disparaît.
 
