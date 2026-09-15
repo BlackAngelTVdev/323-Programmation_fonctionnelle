@@ -2,25 +2,25 @@
 
 ## Concepts théoriques
 
-- [Thématique 02 — Filter et fonctions d'ordre supérieur](../../../../thematiques/02-filter-fonctions-sup.md)
-- [Fonctions d'ordre supérieur](../../../../supports/source/02a-fonctions-sup.md)
+- [Thématique 02 — Filter et fonctions d&#39;ordre supérieur](../../../../thematiques/02-filter-fonctions-sup.md)
+- [Fonctions d&#39;ordre supérieur](../../../../supports/source/02a-fonctions-sup.md)
 - [Filter et prédicats](../../../../supports/source/02b-filter.md)
 - [Closures](../../../../supports/source/02a-fonctions-sup.md#closures-captures-de-variables)
 - [Évaluation paresseuse](../../../../supports/source/02b-filter.md#evaluation-paresseuse-deferred-execution)
 
 ## Contexte
 
-Le dataset contient maintenant les données réelles (CSV) et les données générées (exercice 02).  
+Le dataset contient maintenant les données réelles (CSV) et les données générées (exercice 02).
 Avant toute analyse, il faut valider que les contraintes sont respectées dans les trois sources.
 
 <hr>
 
-## Étape 1 — Implémenter `.Outliers(predicate)`
+## 3.1 — Détecter les erreurs en implémentant `.Outliers(predicate)`
 
-On appelle "Outlier" une valeur aberrante, impossible dans une série. Si on a par exemple une série de mesures de la température du lac, la valeur "234" est un outlier.  
+On appelle "Outlier" une valeur aberrante, impossible dans une série. Si on a par exemple une série de mesures de la température du lac, la valeur "234" est un outlier.
 Le but de cette méthode est de montrer les outliers. On lui passe une fonction qui détermine si une valeur est "outlier" ou pas.
 
-**Attention :** `Outliers` doit retourner une nouvelle `DataSeries<T>`, sans modifier la série.
+**Attention :** `Outliers` doit retourner une nouvelle `DataSeries<T>`, sans modifier la série originale.
 
 <details>
 <summary>Voir la solution</summary>
@@ -32,7 +32,7 @@ public DataSeries<T> Outliers(Func<T, bool> predicate)
 
 </details>
 
-Observer que `Filter` retourne une **nouvelle** `DataSeries<T>` — la source `_data` n'est
+Observer que `Outliers` retourne une **nouvelle** `DataSeries<T>` — la source `_data` n'est
 jamais modifiée. C'est l'immuabilité : chaque appel produit un nouvel objet.
 
 Vérifier dans `Program.cs` :
@@ -45,12 +45,12 @@ Console.WriteLine(baaad.Count);     // sous-ensemble
 
 <hr>
 
-## Étape 2 — Implémenter `.Sanitize(predicate)`
+## 3.2 — Supprimer les erreurs en implémentant `.Sanitize(predicate)`
 
 Cette méthode nettoie une série en enlevant les outliers.
 
-Il y a plusieurs manières de réaliser `Sanitize`. Comparez vos solutions entre vous.  
-Quelqu'un a-t-il utilisé `Outliers` pour coder `Sanitize` ? 
+Il y a plusieurs manières de réaliser `Sanitize`. Comparez vos solutions entre vous.
+Quelqu'un a-t-il utilisé `Outliers` pour coder `Sanitize` ?
 
 Appliquer à chaque jeu pour éliminer les valeurs impossibles :
 
@@ -76,14 +76,22 @@ lol.Sanitize(m =>
     m.Cs      < 0
 );
 ```
+
+Vérifier dans `Program.cs` :
+
+```csharp
+Console.WriteLine(valorant.Count); // 25
+var clean = valorant.Sanitize(m => m.Value.Kills < 0);
+Console.WriteLine(valorant.Count); // 24
+```
+
 <hr>
 
-## Étape 3 — Interface CLI
+## 3.3 — CLI pour définir le comportement face aux erreurs
 
 Ajouter les flags `--player <nom>` et `--filter wins|losses|all`.
-Ces deux flags se combinent avec `--game` introduit en exercice 01.
 
-Ajouter un flag `--error [strict | soft]` : en strict, on affiche les outliers et on s'arrête. En soft, on les élimine et on continue
+Ajouter un flag `--error [strict | soft | hard]` : en strict, on affiche les outliers et on s'arrête. En soft, on les élimine et on continue. En hard, on les élimine, on sauve le fichier et on continue.
 
 **Avant de coder :** Si `--player` est absent, que filtrer ? Si `--filter` vaut `"all"`,
 faut-il appliquer un prédicat ? Plutôt qu'un if/else par mode, que gagne-t-on à stocker
@@ -93,7 +101,7 @@ les prédicats dans un **dictionnaire** ? Que faut-il faire pour ajouter un crit
 <details>
 <summary>Indice — dispatch fonctionnel</summary>
 
-Une fonction est une valeur : elle peut être la *valeur* d'un dictionnaire.
+Une fonction est une valeur : elle peut être la _valeur_ d'un dictionnaire.
 `Dictionary<string, Func<ValorantMatch, bool>>` associe chaque mode CLI à son prédicat —
 le if/else disparaît.
 
