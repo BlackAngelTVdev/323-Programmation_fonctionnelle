@@ -146,3 +146,35 @@ Console.WriteLine($"Meilleur match de Léa : {meilleurLea.date:yyyy-MM-dd} (norm
 DataSeries<double> visionNoeNorm = lol.Filter(m => m.Player == "Noé").Normalize(m => m.VisionScore);
 Console.WriteLine($"Noé — KDA normalisé moyen {kdaNoeNorm.Values.Average():F2}" +
                   $" / vision score normalisé moyen {visionNoeNorm.Values.Average():F2}");
+
+// --- 4.3 Smooth : moyenne glissante ----------------------------------------
+int window = 3;
+DataSeries<double> lisseLea = kdaLea.Smooth(window, v => v);
+window = 10; // SANS EFFET : window a été copiée à l'appel de Smooth (passage d'argument).
+             // Le lambda capture le PARAMÈTRE windowSize, qui ne change plus jamais.
+Console.WriteLine($"KDA Léa : {kdaLea.Count} valeurs brutes -> {lisseLea.Count} lissées (fenêtre 3, les 2 premières écartées)");
+
+// Fenêtre causale : la valeur lissée d'indice i est la moyenne des bruts [i-2 .. i],
+// et elle garde la date de i (le dernier élément de sa fenêtre).
+var brutsList = kdaLea.Timestamps.Zip(kdaLea.Values, (d, v) => (d, v)).ToList();
+var lissesList = lisseLea.Timestamps.Zip(lisseLea.Values, (d, v) => (d, v)).ToList();
+foreach (int i in Enumerable.Range(brutsList.Count - 3, 3))
+{
+    string fenetre = string.Join(", ", brutsList.Skip(i - 2).Take(3).Select(b => b.v.ToString("F2")));
+    int j = i - 2; // indice correspondant dans la série lissée (elle commence à i = 2)
+    Console.WriteLine($"   {lissesList[j].d:yyyy-MM-dd}  lissé {lissesList[j].v,5:F2}  =  moyenne de [{fenetre}]");
+}
+
+// Lisser atténue les pointes : l'amplitude se réduit, la tendance reste.
+double Amplitude(DataSeries<double> s) => s.Values.Max() - s.Values.Min();
+Console.WriteLine($"Léa : amplitude brute {Amplitude(kdaLea):F2} -> lissée {Amplitude(lisseLea):F2}");
+
+// L'évaluateur porte sur T : ici une série de matchs CS2, fenêtre de 5.
+DataSeries<double> lisseRaphael = cs2.Filter(m => m.Player == "Raphaël").Smooth(5, Metrics.Kda);
+Console.WriteLine($"Raphaël : KDA lissé(w=5) sur {lisseRaphael.Count} matchs, " +
+                  $"du {lisseRaphael.Timestamps.First():yyyy-MM-dd} au {lisseRaphael.Timestamps.Last():yyyy-MM-dd}");
+
+// Composition : Smooth puis Normalize, chaque étape retourne une nouvelle série.
+DataSeries<double> lisseNormalise = kdaLea.Smooth(3, v => v).Normalize(v => v);
+Console.WriteLine($"Smooth(3) puis Normalize : {lisseNormalise.Count} valeurs, " +
+                  $"min {lisseNormalise.Values.Min():F2}, max {lisseNormalise.Values.Max():F2}");

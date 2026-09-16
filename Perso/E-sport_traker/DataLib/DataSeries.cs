@@ -86,5 +86,42 @@ namespace DataLib
             return DataSeries<double>.From(evaluated.Select(e =>
                 (e.Timestamp, range == 0 ? 0.0 : (e.Value - min) / range)));
         }
+
+        // Moyenne glissante : la valeur d'indice i est la moyenne des éléments
+        // d'indices [i - windowSize + 1 .. i], donc des windowSize derniers éléments.
+        // Les windowSize - 1 premiers indices n'ont pas de fenêtre complète : on les
+        // écarte, la série lissée est donc plus courte. Chaque valeur lissée garde la
+        // date du DERNIER élément de sa fenêtre (la fenêtre est causale : elle regarde
+        // en arrière, elle ne connaît pas le futur).
+        public DataSeries<double> Smooth(int windowSize, Func<T, double> evaluator)
+        {
+            if (windowSize < 1)
+                throw new ArgumentOutOfRangeException(nameof(windowSize), windowSize,
+                    "La taille de la fenêtre doit être au moins 1.");
+
+            // Comme Normalize : on doit accéder aux éléments par index, donc on
+            // matérialise, et on évalue une seule fois par élément.
+            var evaluated = Pairs()
+                .Select(p => (p.Timestamp, Value: evaluator(p.Value)))
+                .ToList();
+
+            // Tous les indices i pour lesquels i - windowSize + 1 >= 0 :
+            // ce sont les seuls où une fenêtre de taille windowSize est disponible.
+            var indices = Enumerable.Range(
+                windowSize - 1,
+                Math.Max(0, evaluated.Count - windowSize + 1));
+
+            return DataSeries<double>.From(indices.Select(i =>
+            {
+                // Le lambda capture windowSize (le paramètre) et evaluated :
+                // la fenêtre [i - windowSize + 1 .. i] = Skip(...).Take(...).
+                double moyenne = evaluated
+                    .Skip(i - windowSize + 1)
+                    .Take(windowSize)
+                    .Average(e => e.Value);
+
+                return (evaluated[i].Timestamp, moyenne);
+            }));
+        }
     }
 }
