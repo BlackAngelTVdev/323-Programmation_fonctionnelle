@@ -239,7 +239,7 @@ Situation en fin de matinée:
 | gianmarco |    *    |  ok   |  ok   |  ok   |        |        |        |        |        |        |        |        |
 | gillian   |         |  ok   |  ok   |       |        |        |        |        |        |        |        |        |
 | kiril     |    *    |  ok   |  ok   |  ok   | **OK** | **OK** | **OK** |        |        |        |        |        |
-| sacha     |    *    |  ok   |  ok   |       |   ok   |        |        |        |        |        |        |        |
+| sacha     |    *    |  ok   |  ok   |       |   ok   | **OK** | **OK** | **OK** |        |        |        |        |
 | snehan    |    *    |  ok   |  ok   |  ok   | **OK** | **OK** | **OK** |        |        |        |        |        |
 | theophile |         |  ok   |  ok   |       |   ok   |        |        |        |        |        |        |        |
 | tony      |    *    |  ok   |  ok   |  ok   |   ok   | **OK** | **OK** | **OK** | **OK** |        |        |        |
