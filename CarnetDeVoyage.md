@@ -176,9 +176,11 @@ Un constat général : maintenant que le code a commencé, je veux pouvoir l'ex�
 
 ### Mercredi 16 septembre
 
-On commence par faire le checkpoint #3
+On est en effectif réduit aujourd'hui: huit sur douze.
 
-Ensuite on revient sur les exercices proposés la semaine passée:
+On a fait le checkpoint #3
+
+Ensuite on a fait le point sur les exercices proposés la semaine passée:
 
 - L'exercice 2 porte sur la génération et la transformation
   - 2.0 `DataSeries<T>` comme vraie série temporelle
@@ -191,36 +193,56 @@ Ensuite on revient sur les exercices proposés la semaine passée:
   - 3.2 Supprimer les erreurs (Where)
   - 3.3 CLI pour définir le comportement face aux erreurs
 
-Voici la synthèse que je fais sur la base des commits que je vois dans vos repos et des points de situation que vous avez rédigés :
+La synthèse est validée (pour les présents):
 
-|           | 2.1 | 2.2 | 2.3 | 2.4 | 3.1 | 3.2 | 3.3 |
-| --------- | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| albert    | OK  |     |     |     |     |     |     |
-| damienc   | OK  | OK  | OK  |     |     |     |     |
-| damienr   | OK  | OK  | OK  | OK  |     |     |     |
-| erdem     | OK  | OK  | OK  |     |     |     |     |
-| gianmarco | OK  | OK  | OK  |     |     |     |     |
-| gillian   | OK  | OK  |     |     |     |     |     |
-| kiril     | OK  | OK  | OK  |     |     |     |     |
-| sacha     | OK  | OK  |     | OK  |     |     |     |
-| snehan    | OK  | OK  | OK  |     |     |     |     |
-| theophile | OK  | OK  |     | OK  |     |     |     |
-| tony      | OK  | OK  | OK  | OK  |     |     |     |
-| zidane    | OK  | OK  |     |     |     |     |     |
+|           | Présent |  2.1  |  2.2  |  2.3  |  2.4  |  3.1  |  3.2  |  3.3  |
+| --------- | :-----: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| albert    |    *    |  OK   |       |       |       |       |       |       |
+| damienc   |    *    |  OK   |  OK   |  OK   |       |       |       |       |
+| damienr   |    *    |  OK   |  OK   |  OK   |  OK   |       |       |       |
+| erdem     |         |  OK   |  OK   |  OK   |       |       |       |       |
+| gianmarco |    *    |  OK   |  OK   |  OK   |       |       |       |       |
+| gillian   |         |  OK   |  OK   |       |       |       |       |       |
+| kiril     |    *    |  OK   |  OK   |  OK   |       |       |       |       |
+| sacha     |    *    |  OK   |  OK   |       |  OK   |       |       |       |
+| snehan    |    *    |  OK   |  OK   |  OK   |       |       |       |       |
+| theophile |         |  OK   |  OK   |       |  OK   |       |       |       |
+| tony      |    *    |  OK   |  OK   |  OK   |  OK   |       |       |       |
+| zidane    |         |  OK   |  OK   |       |       |       |       |       |
 
-On se donne une heure (jusqu'à la pause) pour finir ces exercices.
+On a une petite heure (jusqu'à la pause) pour finir ces exercices.
 
-Mais avant cela, la moitié d'entre vous devront défaire quelques changements demandés précédemment 😤.  
-En effet, au début de l'étape 2, nous avions voulu intégrer un Timestamp pour avoir de vraies Timeseries. Nous avions passé de `private readonly IEnumerable<T> _data;` à `private readonly IEnumerable<DataPoint<T>> _data;`. Cela va introduire un degré de complexité supplémentaire significatif pour la suite. Si vous aviez fait ce changement:
+Mais avant cela, certains ont dû défaire quelques changements demandés précédemment 😤.  
+En effet, au début de l'étape 2, nous avions voulu intégrer un Timestamp pour avoir de vraies Timeseries. Nous avions passé de `private readonly IEnumerable<T> _data;` à `private readonly IEnumerable<DataPoint<T>> _data;`. Cela a introduit un degré de complexité supplémentaire significatif pour la suite.  
+Le retour en arrière se fait ainsi:
 
-- Revenez à `private readonly IEnumerable<T> _data;`
-- Ajoutez une propriété `public DateTime Timestamp { get; }` aux trois types de matches
-- Corrigez toutes les erreurs que cela cause
+- Revenir à `private readonly IEnumerable<T> _data;`
+- Supprimer la classe `DataPoint<T>`
+- Ajouter une propriété `public DateTime Timestamp { get; }` aux trois types de matches
+- Corriger toutes les erreurs que cela cause
 
-Et ensuite on continue...
+Rappel au moment de s'y mettre: faire apparaître le numéro de l'étape dans le nom des commits, p.ex.: `feat(ESportApp): Réaliser l'étape 2.2 (Sauver en CSV)`
 
-Faites apparaître le numéro de l'étape dans le nom de vos commits, p.ex.: `feat(ESportApp): Réaliser l'étape 2.2 (Sauver en CSV)`
+Après la pause on a regardé l'énoncé de l'[exercice 4](./exos/fil-rouge/esport/04-performance-map/), qui a pour but de consolider le concept de transformation en générant des **indicateurs** à partir de nos données.
 
-Après la pause on va consolider le concept de transformation en générant des **indicateurs** à partir de nos données avec l'[exercice 4](./exos/fil-rouge/esport/04-performance-map/)
+Petit moment d'explication sur les paramètre CLI:  
+- Comment les passer depuis Visual Studio (Déboguer > Propriété de débogage > Paramètres de ligne de commande)  
+- Comment les traiter `static void Main(string[] args)`
 
-Ceux qui arrivent au bout de l'exercice peuvent encore approfondir avec l'étape bonus et/ou les exercices [Market Is Back](./exos/mib-map/README.md) ou [Rando](./exos/rando/README.md)
+Situation en fin de matinée:
+|           | Présent |  2.1  |  2.2  |  2.3  |  2.4   |  3.1   |  3.2   |  3.3   |  4.1   |  4.2   |  4.3   |  4.4   |
+| --------- | :-----: | :---: | :---: | :---: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
+| albert    |    *    |  ok   |       |       |        |        |        |        |        |        |        |        |
+| damienc   |    *    |  ok   |  ok   |  ok   |        |        |        |        |        |        |        |        |
+| damienr   |    *    |  ok   |  ok   |  ok   |   ok   | **OK** | **OK** | **OK** | **OK** | **OK** | **OK** | **OK** |
+| erdem     |         |  ok   |  ok   |  ok   |        |        |        |        |        |        |        |        |
+| gianmarco |    *    |  ok   |  ok   |  ok   |        |        |        |        |        |        |        |        |
+| gillian   |         |  ok   |  ok   |       |        |        |        |        |        |        |        |        |
+| kiril     |    *    |  ok   |  ok   |  ok   | **OK** | **OK** | **OK** |        |        |        |        |        |
+| sacha     |    *    |  ok   |  ok   |       |   ok   |        |        |        |        |        |        |        |
+| snehan    |    *    |  ok   |  ok   |  ok   | **OK** | **OK** | **OK** |        |        |        |        |        |
+| theophile |         |  ok   |  ok   |       |   ok   |        |        |        |        |        |        |        |
+| tony      |    *    |  ok   |  ok   |  ok   |   ok   | **OK** | **OK** | **OK** | **OK** |        |        |        |
+| zidane    |         |  ok   |  ok   |       |        |        |        |        |        |        |        |        |
+
+
