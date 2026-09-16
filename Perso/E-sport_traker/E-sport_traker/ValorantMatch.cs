@@ -2,7 +2,7 @@ using DataLib;
 
 namespace E_sport_traker
 {
-    public class ValorantMatch : ITimestamped
+    public class ValorantMatch : IMatch
     {
         public DateTime Timestamp { get; }
         public string Player { get; }
