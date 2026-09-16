@@ -37,6 +37,15 @@ Console.WriteLine($"Matchs jan–mars : {q1.Count}");
 DataSeries<ValorantMatch> q1Wins = valorant.FilterByDate(d => d.Month <= 3).Filter(m => m.Won);
 Console.WriteLine($"Victoires jan–mars : {q1Wins.Count}");
 
+// 3.1 — Détection des outliers : on passe un prédicat qui décrit la valeur aberrante.
+DataSeries<ValorantMatch> baaad = valorant.Outliers(m => m.Kills < 0);
+Console.WriteLine($"Valorant       : {valorant.Count} matchs (inchangé)"); // 25 — immuable
+Console.WriteLine($"Outliers Kills : {baaad.Count}");
+
+// Validation des contraintes sur les trois sources avant analyse.
+Console.WriteLine($"Outliers CS2 : {cs2.Outliers(m => !isValid(m)).Count}");
+Console.WriteLine($"Outliers LoL : {lol.Outliers(m => m.Kills < 0 || m.Deaths < 0 || m.Cs < 0).Count}");
+
 DataSeries<Cs2Match> raphaelGenerated = MatchGenerator.GenerateCs2("Raphaël", 20);
 Console.WriteLine(raphaelGenerated.Count); // 20
 
@@ -48,9 +57,9 @@ ExportCs2(raphaelValid, "./data/raphael_generated.csv");
 static void ExportCs2(DataSeries<Cs2Match> matches, string path)
 {
     string header = "date,player,map,start_side,kills,deaths,assists,mvps,won";
-    IEnumerable<string> lines = matches.DataPoints.Select(dp =>
-        $"{dp.Timestamp:yyyy-MM-dd},{dp.Value.Player},{dp.Value.Map},{dp.Value.StartSide}," +
-        $"{dp.Value.Kills},{dp.Value.Deaths},{dp.Value.Assists},{dp.Value.Mvps},{dp.Value.Won.ToString().ToLower()}"
+    IEnumerable<string> lines = matches.Values.Select(m =>
+        $"{m.Timestamp:yyyy-MM-dd},{m.Player},{m.Map},{m.StartSide}," +
+        $"{m.Kills},{m.Deaths},{m.Assists},{m.Mvps},{m.Won.ToString().ToLower()}"
     );
     File.WriteAllLines(path, lines.Prepend(header));
-}
+}

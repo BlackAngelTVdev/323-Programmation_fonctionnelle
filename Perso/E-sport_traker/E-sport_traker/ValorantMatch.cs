@@ -2,8 +2,9 @@ using DataLib;
 
 namespace E_sport_traker
 {
-    public class ValorantMatch
+    public class ValorantMatch : ITimestamped
     {
+        public DateTime Timestamp { get; }
         public string Player { get; }
         public string Agent { get; }
         public int Kills { get; }
@@ -13,15 +14,17 @@ namespace E_sport_traker
         public int Rounds { get; }
         public bool Won { get; }
 
-        public ValorantMatch(string player, string agent, int kills, int deaths,
+        public ValorantMatch(DateTime timestamp, string player, string agent, int kills, int deaths,
                              int assists, int score, int rounds, bool won)
         {
+            Timestamp = timestamp;
             Player = player; Agent = agent; Kills = kills; Deaths = deaths;
             Assists = assists; Score = score; Rounds = rounds; Won = won;
         }
 
-        public static ValorantMatch Parse(string[] cols) =>
+        public static ValorantMatch Parse(DateTime timestamp, string[] cols) =>
             new ValorantMatch(
+                timestamp,
                 cols[1],
                 cols[2],
                 int.Parse(cols[3]),

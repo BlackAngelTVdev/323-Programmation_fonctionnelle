@@ -2,8 +2,9 @@ using DataLib;
 
 namespace E_sport_traker
 {
-    public class Cs2Match
+    public class Cs2Match : ITimestamped
     {
+        public DateTime Timestamp { get; }
         public string Player { get; }
         public string Map { get; }
         public string StartSide { get; }
@@ -13,15 +14,17 @@ namespace E_sport_traker
         public int Mvps { get; }
         public bool Won { get; }
 
-        public Cs2Match(string player, string map, string startSide, int kills,
+        public Cs2Match(DateTime timestamp, string player, string map, string startSide, int kills,
                         int deaths, int assists, int mvps, bool won)
         {
+            Timestamp = timestamp;
             Player = player; Map = map; StartSide = startSide; Kills = kills;
             Deaths = deaths; Assists = assists; Mvps = mvps; Won = won;
         }
 
-        public static Cs2Match Parse(string[] cols) =>
+        public static Cs2Match Parse(DateTime timestamp, string[] cols) =>
             new Cs2Match(
+                timestamp,
                 cols[1],
                 cols[2],
                 cols[3],

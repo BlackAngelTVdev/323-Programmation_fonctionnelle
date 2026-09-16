@@ -2,8 +2,9 @@ using DataLib;
 
 namespace E_sport_traker
 {
-    public class LolMatch
+    public class LolMatch : ITimestamped
     {
+        public DateTime Timestamp { get; }
         public string Player { get; }
         public string Champion { get; }
         public int Kills { get; }
@@ -13,16 +14,17 @@ namespace E_sport_traker
         public int VisionScore { get; }
         public bool Won { get; }
 
-        public LolMatch(string player, string champion, int kills, int deaths,
+        public LolMatch(DateTime timestamp, string player, string champion, int kills, int deaths,
                         int assists, int cs, int visionScore, bool won)
         {
+            Timestamp = timestamp;
             Player = player; Champion = champion; Kills = kills; Deaths = deaths;
             Assists = assists; Cs = cs; VisionScore = visionScore; Won = won;
         }
 
-        
-        public static LolMatch Parse(string[] cols) =>
+        public static LolMatch Parse(DateTime timestamp, string[] cols) =>
             new LolMatch(
+                timestamp,
                 cols[1],
                 cols[2],
                 int.Parse(cols[4]),
