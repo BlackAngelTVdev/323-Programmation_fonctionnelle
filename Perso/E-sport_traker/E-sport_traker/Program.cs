@@ -46,6 +46,26 @@ Console.WriteLine($"Outliers Kills : {baaad.Count}");
 Console.WriteLine($"Outliers CS2 : {cs2.Outliers(m => !isValid(m)).Count}");
 Console.WriteLine($"Outliers LoL : {lol.Outliers(m => m.Kills < 0 || m.Deaths < 0 || m.Cs < 0).Count}");
 
+// 3.2 — Nettoyage : Sanitize enlève les valeurs impossibles de chaque jeu.
+DataSeries<ValorantMatch> cleanValorant = valorant.Sanitize(m =>
+    m.Kills < 0 || m.Kills > 50 ||
+    m.Deaths < 0 || m.Deaths > 30 ||
+    m.Assists < 0);
+
+DataSeries<Cs2Match> cleanCs2 = cs2.Sanitize(m =>
+    m.Kills + m.Assists > 50 ||
+    m.Deaths < 0);
+
+DataSeries<LolMatch> cleanLol = lol.Sanitize(m =>
+    m.Kills > 10 ||
+    m.Deaths < 1 ||
+    m.Assists < 0 ||
+    m.Cs < 0);
+
+Console.WriteLine($"Valorant nettoyé : {valorant.Count} -> {cleanValorant.Count} (source inchangée)");
+Console.WriteLine($"CS2 nettoyé      : {cs2.Count} -> {cleanCs2.Count}");
+Console.WriteLine($"LoL nettoyé      : {lol.Count} -> {cleanLol.Count}");
+
 DataSeries<Cs2Match> raphaelGenerated = MatchGenerator.GenerateCs2("Raphaël", 20);
 Console.WriteLine(raphaelGenerated.Count); // 20
 

@@ -30,6 +30,11 @@ namespace DataLib
         public DataSeries<T> Outliers(Func<T, bool> predicate)
             => DataSeries<T>.From(_data.Where(predicate));
 
+        // Retourne une nouvelle série nettoyée : les valeurs décrites par le prédicat
+        // (les outliers) sont retirées. La série source n'est jamais modifiée.
+        public DataSeries<T> Sanitize(Func<T, bool> predicate)
+            => DataSeries<T>.From(_data.Where(v => !predicate(v)));
+
         public DataSeries<T> FilterByDate(Func<DateTime, bool> predicate)
             => new DataSeries<T>(_data.Where(v => predicate(v.Timestamp)));
     }
