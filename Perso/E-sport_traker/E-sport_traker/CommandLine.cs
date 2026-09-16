@@ -36,7 +36,7 @@ namespace E_sport_traker
     }
 
     public sealed record ModeReport(string Name, int Total, int Filtered, int Outliers,
-                                    int Remaining, IReadOnlyList<string> OutlierRows, string? SavedPath);
+                                    int Remaining, double StatMean, IReadOnlyList<string> OutlierRows, string? SavedPath);
 
     public static class CommandLine
     {
@@ -48,6 +48,17 @@ namespace E_sport_traker
                 ["all"] = _ => true,
                 ["wins"] = m => m.Won,
                 ["losses"] = m => !m.Won,
+            };
+
+        // --- Table de sélecteurs : le flag --stat choisit la FONCTION de transformation.
+        // Un Func<ICombatMatch, double> est une valeur comme une autre : ajouter une stat
+        // = une ligne ici, et l'appel à Transform ne change jamais.
+        public static readonly IReadOnlyDictionary<string, Func<ICombatMatch, double>> StatSelectors =
+            new Dictionary<string, Func<ICombatMatch, double>>
+            {
+                ["kda"] = m => Metrics.Kda(m.Kills, m.Assists, m.Deaths),
+                ["kills"] = m => m.Kills,
+                ["assists"] = m => m.Assists,
             };
 
         // --- Politique face aux erreurs, décrite comme des drapeaux plutôt que
@@ -101,14 +112,15 @@ namespace E_sport_traker
                     $"{m.Timestamp:yyyy-MM-dd},{m.Player},{m.Champion},,{m.Kills}," +
                     $"{m.Deaths},{m.Assists},{m.Cs},{m.VisionScore},{m.Won.ToString().ToLower()}");
 
-        private sealed record Options(string? Player, Func<IMatch, bool> Filter, string FilterName, ErrorPolicy Policy);
+        private sealed record Options(string? Player, Func<IMatch, bool> Filter, string FilterName,
+                                      ErrorPolicy Policy, Func<ICombatMatch, double> Stat, string StatName);
 
         public static void Run(string[] args)
         {
             Options? options = Parse(args);
             if (options is null) return;
 
-            Console.WriteLine($"--player {options.Player ?? "(tous)"} | --filter {options.FilterName} | --error {options.Policy.Name}");
+            Console.WriteLine($"--player {options.Player ?? "(tous)"} | --filter {options.FilterName} | --error {options.Policy.Name} | --stat {options.StatName}");
             Console.WriteLine();
 
             List<ModeReport> reports = new();
@@ -130,7 +142,7 @@ namespace E_sport_traker
             }
 
             Console.WriteLine();
-            PrintSummary(reports);
+            PrintSummary(reports, options.StatName);
         }
 
         private static Options? Parse(string[] args)
@@ -151,7 +163,15 @@ namespace E_sport_traker
                 Console.WriteLine($"--error inconnu : {errorName} (attendu : strict | soft | hard)");
                 return null;
             }
-            return new Options(player, filter, filterName, policy);
+
+            // --stat sans valeur : on retombe sur kda (la métrique par défaut).
+            string statName = FlagValue(args, "--stat") ?? "kda";
+            if (!StatSelectors.TryGetValue(statName, out Func<ICombatMatch, double>? stat))
+            {
+                Console.WriteLine($"--stat inconnue : {statName} (attendu : {string.Join(" | ", StatSelectors.Keys)})");
+                return null;
+            }
+            return new Options(player, filter, filterName, policy, stat, statName);
         }
 
         private static string? FlagValue(string[] args, string flag)
@@ -202,7 +222,7 @@ namespace E_sport_traker
         }
 
         private static ModeReport Execute<T>(MatchDataset<T> dataset, string? player, Options options)
-            where T : IMatch
+            where T : ICombatMatch
         {
             // Le prédicat commun (IMatch) est réappliqué sur T : variance non permise
             // car T pourrait être un struct implémentant IMatch.
@@ -217,6 +237,11 @@ namespace E_sport_traker
             // Nettoyage éventuel : la série source n'est jamais modifiée.
             DataSeries<T> kept = options.Policy.Clean ? filtered.Sanitize(dataset.IsOutlier) : filtered;
 
+            // La transformation choisie (--stat) s'applique à la série retenue :
+            // le sélecteur est une valeur tirée de la table, la source reste intacte.
+            DataSeries<double> stats = kept.Transform(m => options.Stat(m));
+            double statMean = stats.Count == 0 ? 0.0 : stats.Values.Average();
+
             string? saved = null;
             if (options.Policy.Save)
             {
@@ -225,7 +250,7 @@ namespace E_sport_traker
             }
 
             return new ModeReport(dataset.Name, dataset.Series.Count, filtered.Count,
-                                  outliers.Count, kept.Count, outlierRows, saved);
+                                  outliers.Count, kept.Count, statMean, outlierRows, saved);
         }
 
         private static void PrintOutliers(ModeReport report)
@@ -235,12 +260,12 @@ namespace E_sport_traker
                 Console.WriteLine($"  {row}");
         }
 
-        private static void PrintSummary(IReadOnlyList<ModeReport> reports)
+        private static void PrintSummary(IReadOnlyList<ModeReport> reports, string statName)
         {
-            Console.WriteLine($"{"Jeu",-22}{"Total",7}{"Filtrés",9}{"Outliers",10}{"Restants",10}");
+            Console.WriteLine($"{"Jeu",-22}{"Total",7}{"Filtrés",9}{"Outliers",10}{"Restants",10}{$"{statName} moy",12}");
             foreach (ModeReport r in reports)
             {
-                Console.WriteLine($"{r.Name,-22}{r.Total,7}{r.Filtered,9}{r.Outliers,10}{r.Remaining,10}");
+                Console.WriteLine($"{r.Name,-22}{r.Total,7}{r.Filtered,9}{r.Outliers,10}{r.Remaining,10}{r.StatMean,12:F2}");
                 if (r.SavedPath is not null)
                     Console.WriteLine($"  -> nettoyé écrit dans {r.SavedPath}");
             }
