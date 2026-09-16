@@ -112,3 +112,37 @@ Ligne("Noé", "LoL", lol.Filter(m => m.Player == "Noé").Transform(Metrics.Kda))
 
 // Mapper défini en lambda (plutôt qu'en groupe de méthodes) sur la formule brute.
 Console.WriteLine($"KDA Valorant gagnés : {Moyenne(valorant.Filter(m => m.Won).Transform(m => Metrics.Kda(m.Kills, m.Assists, m.Deaths))):F2}");
+
+// --- 4.2 Normalize : comparer des pommes et des poires ----------------------
+// Un KDA de 5 ne veut pas dire la même chose selon le jeu : chaque jeu a sa
+// propre échelle. On ramène donc chaque série dans [0, 1].
+DataSeries<double> kdaDylan = valorant.Filter(m => m.Player == "Dylan").Transform(Metrics.Kda);
+DataSeries<double> kdaRaphael = cs2.Filter(m => m.Player == "Raphaël").Transform(Metrics.Kda);
+DataSeries<double> kdaNoe = lol.Filter(m => m.Player == "Noé").Transform(Metrics.Kda);
+
+// L'évaluateur dit ce qu'on normalise : sur une série de KDA déjà calculés c'est
+// l'identité, sur une série de matchs c'est la métrique du domaine.
+DataSeries<double> kdaLeaNorm = kdaLea.Normalize(v => v);
+DataSeries<double> kdaRaphaelNorm = cs2.Filter(m => m.Player == "Raphaël").Normalize(Metrics.Kda);
+DataSeries<double> kdaNoeNorm = kdaNoe.Normalize(v => v);
+
+void Norm(string joueur, DataSeries<double> brut, DataSeries<double> norm)
+    => Console.WriteLine($"{joueur,-8} KDA brut {brut.Values.Min(),5:F2} .. {brut.Values.Max(),5:F2}" +
+                         $"  ->  normalisé {norm.Values.Min():F2} .. {norm.Values.Max():F2}" +
+                         $"   ({norm.Count} valeurs, toutes dans [0,1] : {norm.Values.All(v => v >= 0 && v <= 1)})");
+
+Norm("Léa", kdaLea, kdaLeaNorm);
+Norm("Dylan", kdaDylan, kdaDylan.Normalize(v => v));
+Norm("Raphaël", kdaRaphael, kdaRaphaelNorm);
+Norm("Noé", kdaNoe, kdaNoeNorm);
+
+// Les timestamps ont suivi la normalisation : le max reste retrouvable dans le temps.
+var meilleurLea = kdaLeaNorm.Timestamps
+    .Zip(kdaLeaNorm.Values, (date, kda) => (date, kda))
+    .First(p => p.kda == 1);
+Console.WriteLine($"Meilleur match de Léa : {meilleurLea.date:yyyy-MM-dd} (normalisé 1.00, KDA brut {kdaLea.Values.Max():F2})");
+
+// Pommes et poires : deux grandeurs de natures différentes, désormais comparables.
+DataSeries<double> visionNoeNorm = lol.Filter(m => m.Player == "Noé").Normalize(m => m.VisionScore);
+Console.WriteLine($"Noé — KDA normalisé moyen {kdaNoeNorm.Values.Average():F2}" +
+                  $" / vision score normalisé moyen {visionNoeNorm.Values.Average():F2}");

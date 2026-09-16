@@ -59,5 +59,32 @@ namespace DataLib
         // timestamps traversent la transformation, ils restent alignés sur les valeurs.
         public DataSeries<TResult> Transform<TResult>(Func<T, TResult> mapper)
             => new DataSeries<TResult>(_data.Select(mapper), _timestamps);
+
+        // Normalisation min-max : ramène chaque valeur évaluée dans [0, 1] avec
+        //     x' = (x - min) / (max - min)
+        // La plus petite valeur vaut 0, la plus grande vaut 1, les autres sont
+        // placées proportionnellement : les séries deviennent comparables, quelle
+        // que soit leur unité (un KDA, un vision score, des headshots...).
+        public DataSeries<double> Normalize(Func<T, double> evaluator)
+        {
+            // Il faut connaître les extrêmes, donc tout voir une fois : c'est le
+            // seul endroit de la librairie qui rompt la paresse. On évalue ici,
+            // une seule fois par élément, pour ne pas rappeler l'évaluateur ensuite.
+            var evaluated = Pairs()
+                .Select(p => (p.Timestamp, Value: evaluator(p.Value)))
+                .ToList();
+
+            if (evaluated.Count == 0)
+                return DataSeries<double>.From(Enumerable.Empty<(DateTime Timestamp, double Value)>());
+
+            double min = evaluated.Min(e => e.Value);
+            double max = evaluated.Max(e => e.Value);
+            double range = max - min;
+
+            // Série constante (amplitude nulle) : rien à étaler, on renvoie 0 pour
+            // tout le monde plutôt que de diviser par zéro.
+            return DataSeries<double>.From(evaluated.Select(e =>
+                (e.Timestamp, range == 0 ? 0.0 : (e.Value - min) / range)));
+        }
     }
 }
