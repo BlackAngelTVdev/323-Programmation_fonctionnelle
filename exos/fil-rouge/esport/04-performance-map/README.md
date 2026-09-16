@@ -33,9 +33,9 @@ La source n'est jamais modifiée.
 
 ## 4.1 — Calculer les KDA (ou tout autre indicateur) `.Transform(mapper)`
 
-Nous voulons que notre librairie `DataSeries` offre la possibilité d'appliquer une transformation à tous les éléments d'une série, tout en conservant leurs timestamps.
-Nous tenons au fait que la librairie reste générale (générique!) pour pouvoir être utilisée dans des domaines d'application différents les uns des autres.
-Nous devons donc être capable de faire la transformation de ... n'importe quoi en ... n'importe quoi !
+Nous voulons que notre librairie `DataSeries` offre la possibilité d'appliquer une transformation à tous les éléments d'une série.  
+Nous tenons au fait que la librairie reste générale (générique!) pour pouvoir être utilisée dans des domaines d'application différents les uns des autres.  
+Nous devons donc être capable de faire la transformation de ... n'importe quoi en ... n'importe quoi !  
 C'est mission impossible! Sauf si on nous fournit l'outil (la fonction) qui sait faire cette transformation.
 
 **Avant de coder :**
