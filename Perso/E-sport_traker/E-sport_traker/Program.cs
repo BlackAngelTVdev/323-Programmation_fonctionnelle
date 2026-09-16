@@ -79,3 +79,36 @@ DataSeries<Cs2Match> raphaelValid = raphaelGenerated.Filter(isValid);
 Console.WriteLine($"Avant : {raphaelGenerated.Count}, après : {raphaelValid.Count}");
 
 CommandLine.Cs2("./data/raphael_generated.csv", "Raphaël (généré)").Save(raphaelValid);
+
+// --- 4.1 Transform : le KDA, une seule métrique pour les trois jeux ---------
+// Le mapper vient du domaine (Metrics) : DataLib ne sait qu'appliquer une
+// fonction, il ignore ce qu'est un KDA. La librairie reste donc générique.
+DataSeries<double> kdaValorant = valorant.Transform(Metrics.Kda);
+Console.WriteLine($"KDA Valorant : {kdaValorant.Count} valeurs, source {valorant.Count} matchs (inchangée)");
+
+// Le chaînage Filter(...).Transform(...) n'est possible que parce que chaque
+// méthode retourne un NOUVEL objet : immuabilité -> composition.
+DataSeries<double> kdaLea = valorant.Filter(m => m.Player == "Léa").Transform(Metrics.Kda);
+DataSeries<double> kdaLeaWins = valorant.Filter(m => m.Player == "Léa" && m.Won).Transform(Metrics.Kda);
+Console.WriteLine($"KDA de Léa : {kdaLea.Count} matchs, dont {kdaLeaWins.Count} gagnés");
+
+// Les timestamps ont traversé la transformation : la série de doubles reste une
+// timeseries, on peut encore la découper par date ou par valeur.
+Console.WriteLine($"KDA de Léa du {kdaLea.Timestamps.First():yyyy-MM-dd} au {kdaLea.Timestamps.Last():yyyy-MM-dd}");
+Console.WriteLine($"KDA Valorant jan-mars : {kdaValorant.FilterByDate(d => d.Month <= 3).Count} valeurs (FilterByDate sur des doubles)");
+Console.WriteLine($"KDA Valorant >= 2.0   : {kdaValorant.Filter(v => v >= 2).Count} valeurs");
+
+// Comparaison inter-jeux : la même métrique rend les 5 joueurs comparables.
+double Moyenne(DataSeries<double> series) => series.Count == 0 ? 0 : series.Values.Average();
+
+void Ligne(string joueur, string jeu, DataSeries<double> kda)
+    => Console.WriteLine($"{joueur,-8} {jeu,-9} {kda.Count,2} matchs   KDA moyen {Moyenne(kda):F2}");
+
+Ligne("Léa", "Valorant", valorant.Filter(m => m.Player == "Léa").Transform(Metrics.Kda));
+Ligne("Dylan", "Valorant", valorant.Filter(m => m.Player == "Dylan").Transform(Metrics.Kda));
+Ligne("Raphaël", "CS2", cs2.Filter(m => m.Player == "Raphaël").Transform(Metrics.Kda));
+Ligne("Kiara", "CS2", cs2.Filter(m => m.Player == "Kiara").Transform(Metrics.Kda));
+Ligne("Noé", "LoL", lol.Filter(m => m.Player == "Noé").Transform(Metrics.Kda));
+
+// Mapper défini en lambda (plutôt qu'en groupe de méthodes) sur la formule brute.
+Console.WriteLine($"KDA Valorant gagnés : {Moyenne(valorant.Filter(m => m.Won).Transform(m => Metrics.Kda(m.Kills, m.Assists, m.Deaths))):F2}");

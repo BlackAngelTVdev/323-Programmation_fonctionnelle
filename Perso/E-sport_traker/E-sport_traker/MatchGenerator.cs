@@ -11,6 +11,8 @@ namespace E_sport_traker
             var sides = new[] { "CT", "T" };
             var start = new DateTime(2023, 9, 1); // début de la pré-saison
 
+            // Chaque match généré porte sa date : on appaire (Timestamp, match)
+            // pour construire la série, qui garde les deux séquences alignées.
             return DataSeries<Cs2Match>.From(
                 Enumerable.Range(1, count)
                     .Select(i => new Cs2Match(
@@ -24,6 +26,7 @@ namespace E_sport_traker
                         rng.Next(0, 5),     // mvps
                         rng.Next(2) == 0    // won
                     ))
+                    .Select(m => (m.Timestamp, m))
             );
         }
     }
