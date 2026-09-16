@@ -230,19 +230,21 @@ Petit moment d'explication sur les paramètre CLI:
 - Comment les traiter `static void Main(string[] args)`
 
 Situation en fin de matinée:
-|           | Présent |  2.1  |  2.2  |  2.3  |  2.4   |  3.1   |  3.2   |  3.3   |  4.1   |  4.2   |  4.3   |  4.4   |
-| --------- | :-----: | :---: | :---: | :---: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
-| albert    |    *    |  ok   |       |       |        |        |        |        |        |        |        |        |
-| damienc   |    *    |  ok   |  ok   |  ok   |        |        |        |        |        |        |        |        |
-| damienr   |    *    |  ok   |  ok   |  ok   |   ok   | **OK** | **OK** | **OK** | **OK** | **OK** | **OK** | **OK** |
-| erdem     |         |  ok   |  ok   |  ok   |        |        |        |        |        |        |        |        |
-| gianmarco |    *    |  ok   |  ok   |  ok   |        |        |        |        |        |        |        |        |
-| gillian   |         |  ok   |  ok   |       |        |        |        |        |        |        |        |        |
-| kiril     |    *    |  ok   |  ok   |  ok   | **OK** | **OK** | **OK** |        |        |        |        |        |
-| sacha     |    *    |  ok   |  ok   |       |   ok   | **OK** | **OK** | **OK** |        |        |        |        |
-| snehan    |    *    |  ok   |  ok   |  ok   | **OK** | **OK** | **OK** |        |        |        |        |        |
-| theophile |         |  ok   |  ok   |       |   ok   |        |        |        |        |        |        |        |
-| tony      |    *    |  ok   |  ok   |  ok   |   ok   | **OK** | **OK** | **OK** | **OK** |        |        |        |
-| zidane    |         |  ok   |  ok   |       |        |        |        |        |        |        |        |        |
+|           | Présent |  2.1  |  2.2  |  2.3   |  2.4   |  3.1   |  3.2   |  3.3   |  4.1   |  4.2   |  4.3   |  4.4   |
+| --------- | :-----: | :---: | :---: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
+| albert    |    *    |  ok   |       | **OK** |        |        |   KO   |        |        |        |        |        |
+| damienc   |    *    |  ok   |  ok   |   ok   | **OK** | **OK** |        |        |        |        |        |        |
+| damienr   |    *    |  ok   |  ok   |   ok   |   ok   | **OK** | **OK** | **OK** | **OK** | **OK** | **OK** | **OK** |
+| erdem     |         |  ok   |  ok   |   ok   |        |        |        |        |        |        |        |        |
+| gianmarco |    *    |  ok   |  ok   |   ok   |        | **OK** | **OK** |        |        |        |        |        |
+| gillian   |         |  ok   |  ok   |        |        |        |        |        |        |        |        |        |
+| kiril     |    *    |  ok   |  ok   |   ok   | **OK** | **OK** | **OK** |        |        |        |        |        |
+| sacha     |    *    |  ok   |  ok   |        |   ok   | **OK** | **OK** | **OK** |        |        |        |        |
+| snehan    |    *    |  ok   |  ok   |   ok   | **OK** | **OK** | **OK** |        |        |        |        |        |
+| theophile |         |  ok   |  ok   |        |   ok   |        |        |        |        |        |        |        |
+| tony      |    *    |  ok   |  ok   |   ok   |   ok   | **OK** | **OK** | **OK** | **OK** |        |        |        |
+| zidane    |         |  ok   |  ok   |        |        |        |        |        |        |        |        |        |
 
+Cette étape conclut la thématique "Transformer". Le checkpoint #4 portera sur les même contenus théorique, mais devrait être plus facile pour vous avec l'expérience acquise ce matin.
 
+La semaine prochaine, on abordera la thématique "Réduire".
