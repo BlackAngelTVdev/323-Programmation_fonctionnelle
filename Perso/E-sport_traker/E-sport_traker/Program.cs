@@ -178,3 +178,66 @@ Console.WriteLine($"Raphaël : KDA lissé(w=5) sur {lisseRaphael.Count} matchs, 
 DataSeries<double> lisseNormalise = kdaLea.Smooth(3, v => v).Normalize(v => v);
 Console.WriteLine($"Smooth(3) puis Normalize : {lisseNormalise.Count} valeurs, " +
                   $"min {lisseNormalise.Values.Min():F2}, max {lisseNormalise.Values.Max():F2}");
+
+// --- 4.4 (bonus) SelectMany : le flatMap ------------------------------------
+// Le coaching staff veut la LISTE PLATE de tous les KDA de l'équipe, tous jeux
+// confondus. Or une collection de séries est une collection IMBRIQUÉE : Select
+// en garderait la structure (une séquence de séquences), SelectMany l'aplatit.
+DataSeries<double> kdaKiara = cs2.Filter(m => m.Player == "Kiara").Transform(Metrics.Kda);
+
+var allSeries = new[] { kdaLea, kdaRaphael, kdaNoe, kdaDylan, kdaKiara };
+
+// ⚠ LE PIÈGE (volontairement faux, à titre de démonstration) :
+// Select conserve l'imbrication -> on obtient 5 « valeurs » (une par joueur),
+// pas les KDA. Le nombre paraît plausible, il est simplement au MAUVAIS NIVEAU :
+// on compte les séries au lieu des matchs. C'est le bug classique du SelectMany.
+IEnumerable<IEnumerable<double>> parSelect = allSeries.Select(s => s.Values);
+int seaux = parSelect.Count();                          // 5 joueurs
+int valeursPlates = allSeries.SelectMany(s => s.Values).Count(); // tous les matchs
+Console.WriteLine($"Select (BUGUÉ)   : {seaux} « valeurs »  <-  {seaux} séries comptées" +
+                  $" au lieu des {valeursPlates} matchs de l'équipe");
+
+// ✅ SelectMany (flatMap) : une seule séquence plate, chaque série est recollée
+// bout à bout. Le type obtenu est IEnumerable<double>, plus IEnumerable<IEnumerable<double>>.
+IEnumerable<double> allKda = allSeries.SelectMany(s => s.Values);
+Console.WriteLine($"KDA de l'équipe entière : {allKda.Count()} valeurs, moyenne {allKda.Average():F2} " +
+                  $"(min {allKda.Min():F2}, max {allKda.Max():F2})");
+
+// Vérification : aucun match ne se perd ni ne se duplique dans l'aplatissement.
+foreach (DataSeries<double> s in allSeries)
+    Console.WriteLine($"   {s.Count,2} matchs");
+Console.WriteLine($"   {allSeries.Sum(s => s.Count),2} matchs au total = {allKda.Count()} valeurs aplaties" +
+                  $" ({allSeries.Sum(s => s.Count) == allKda.Count()})");
+
+// --- Vérifications de l'étape 4 ---------------------------------------------
+Console.WriteLine();
+Console.WriteLine("--- Vérifications étape 4 ---");
+
+// kdaLea.Count = 13 : uniquement les matchs de Léa, aucun autre joueur.
+Console.WriteLine($"[ok] kdaLea.Count = {kdaLea.Count} (matchs de Léa uniquement : {kdaLea.Count == 13})");
+
+// Normalisation min-max : les bornes 0.0 et 1.0 sont atteintes EXACTEMENT,
+// et aucune valeur ne sort de [0, 1].
+Console.WriteLine($"[ok] normalisé : min {kdaLeaNorm.Values.Min():F2}, max {kdaLeaNorm.Values.Max():F2} " +
+                  $"(bornes exactes : {kdaLeaNorm.Values.Min() == 0.0 && kdaLeaNorm.Values.Max() == 1.0}, " +
+                  $"toutes dans [0,1] : {kdaLeaNorm.Values.All(v => v >= 0 && v <= 1)})");
+
+// Smooth(1) : une fenêtre d'un seul élément = l'identité (mêmes valeurs, même count).
+DataSeries<double> lisseLea1 = kdaLea.Smooth(1, v => v);
+bool identite = lisseLea1.Count == kdaLea.Count &&
+                lisseLea1.Values.Zip(kdaLea.Values, (lisse, brut) => lisse == brut).All(same => same);
+Console.WriteLine($"[ok] Smooth(1) = identité : {identite} ({lisseLea1.Count} valeurs conservées)");
+
+// Smooth(3) : la moyenne glissante rapproche les valeurs voisines, donc la somme
+// des écarts entre valeurs consécutives diminue.
+double EcartsConsecutifs(DataSeries<double> s)
+{
+    List<double> v = s.Values.ToList();
+    return v.Zip(v.Skip(1), (a, b) => Math.Abs(b - a)).Sum();
+}
+
+Console.WriteLine($"[ok] Smooth(3) réduit les écarts : {EcartsConsecutifs(kdaLea):F2} -> {EcartsConsecutifs(lisseLea):F2} " +
+                  $"(réduits : {EcartsConsecutifs(lisseLea) < EcartsConsecutifs(kdaLea)})");
+
+// Immuabilité : après toutes ces transformations, la série source est intacte.
+Console.WriteLine($"[ok] valorant.Count = {valorant.Count} après toutes les transformations (inchangé : {valorant.Count == 25})");
