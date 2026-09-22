@@ -63,8 +63,8 @@ namespace DataSeries
 
         // --- Transformer (exercice 04) ---------------------------------------
         // Applique le `mapper` à chaque élément. Le type de sortie n'a aucune
-        // raison d'être le type d'entrée : DataSerie<DataPoint<ValorantMatch>>
-        // devient par exemple DataSerie<double> quand on calcule des KDA.
+        // raison d'être le type d'entrée : DataSerie<ValorantMatch> devient
+        // par exemple DataSerie<double> quand on calcule des KDA.
         public DataSerie<TResult> Transform<TResult>(Func<T, TResult> mapper)
         {
             return DataSerie<TResult>.From(_data.Select(mapper));
