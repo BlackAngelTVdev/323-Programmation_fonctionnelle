@@ -2,9 +2,9 @@
 //
 // Interface en ligne de commande construite à la main : aucune librairie
 // externe, juste des comparaisons sur le tableau `args`.
-// Flags reconnus à ce stade du fil rouge (étape 5.1) :
+// Flags reconnus à ce stade du fil rouge (étape 5.2) :
 //   --help --version --game --player --filter --stat --normalize --smooth
-//   --generate --error --extract
+//   --generate --error --extract --hasCrushed --hasBeenCrushed --hasBeenGod
 // --mme est accepté mais n'a aucun effet seul : seul --extract mme est reconnu.
 
 using DataSeries;
@@ -15,11 +15,16 @@ const string version = "0.5";
 string[] knownFlags =
 {
     "--help", "--version", "--game", "--player", "--filter", "--stat",
-    "--normalize", "--smooth", "--generate", "--error", "--extract", "--mme"
+    "--normalize", "--smooth", "--generate", "--error", "--extract", "--mme",
+    "--hasCrushed", "--hasBeenCrushed", "--hasBeenGod"
 };
 
 // Les flags qui attendent une valeur juste après eux
-string[] valueFlags = { "--game", "--player", "--filter", "--stat", "--smooth", "--generate", "--error", "--extract" };
+string[] valueFlags =
+{
+    "--game", "--player", "--filter", "--stat", "--smooth", "--generate", "--error", "--extract",
+    "--hasCrushed", "--hasBeenCrushed", "--hasBeenGod"
+};
 
 Console.WriteLine($"EsportApp v{version}");
 
@@ -63,6 +68,13 @@ bool normalize = args.Contains("--normalize");
 // --extract min|max|avg|mme : extraire un seul indicateur de la série.
 // Seul --extract mme est reconnu ; --mme seul n'a aucun effet.
 string? extractMode = ValueOf("--extract");
+
+// --hasCrushed/--hasBeenCrushed/--hasBeenGod comparent le KDA de chaque
+// match retenu à un seuil ; l'app répond Yes ou No.
+string? hasCrushedRaw = ValueOf("--hasCrushed");
+string? hasBeenCrushedRaw = ValueOf("--hasBeenCrushed");
+string? hasBeenGodRaw = ValueOf("--hasBeenGod");
+bool seuilDemande = hasCrushedRaw != null || hasBeenCrushedRaw != null || hasBeenGodRaw != null;
 
 // --smooth attend la taille de la fenêtre ; 0 signifie « pas de lissage »
 int smoothWindow = 0;
@@ -119,6 +131,26 @@ if (extractMode != null && !extractModes.Contains(extractMode))
     return;
 }
 
+foreach ((string flag, string? seuil) in new[]
+         {
+             ("--hasCrushed", hasCrushedRaw),
+             ("--hasBeenCrushed", hasBeenCrushedRaw),
+             ("--hasBeenGod", hasBeenGodRaw)
+         })
+{
+    if (seuil != null && !double.TryParse(seuil, out _))
+    {
+        Console.WriteLine($"Valeur invalide pour {flag} : {seuil} (attendu : un nombre)");
+        return;
+    }
+}
+
+if (seuilDemande && player == null)
+{
+    Console.WriteLine("--hasCrushed/--hasBeenCrushed/--hasBeenGod nécessitent --player <nom>.");
+    return;
+}
+
 if (smoothWindow < 0)
 {
     Console.WriteLine($"Fenêtre de lissage invalide : {ValueOf("--smooth")} (attendu : un entier >= 1)");
@@ -160,6 +192,31 @@ DataSerie<DataPoint<Cs2Match>> cs2 =
     DataSerie<DataPoint<Cs2Match>>.FromCsv(@"data/cs2.csv", ParseCS2);
 DataSerie<DataPoint<LolMatch>> lol =
     DataSerie<DataPoint<LolMatch>>.FromCsv(@"data/lol.csv", ParseLoL);
+
+// ─── --hasCrushed / --hasBeenCrushed / --hasBeenGod : Yes/No sur le KDA ──────
+
+if (seuilDemande)
+{
+    Func<IMatch, double> kda = selectors["kda"];
+
+    List<double> kdas = valorant.Values.Select(dp => (IMatch)dp.Value)
+        .Concat(cs2.Values.Select(dp => (IMatch)dp.Value))
+        .Concat(lol.Values.Select(dp => (IMatch)dp.Value))
+        .Where(m => m.Player == player && filters[filterMode](m))
+        .Select(kda)
+        .ToList();
+
+    if (hasCrushedRaw != null)
+        Console.WriteLine(kdas.Any(v => v > double.Parse(hasCrushedRaw)) ? "Yes" : "No");
+
+    if (hasBeenCrushedRaw != null)
+        Console.WriteLine(kdas.Any(v => v < double.Parse(hasBeenCrushedRaw)) ? "Yes" : "No");
+
+    if (hasBeenGodRaw != null)
+        Console.WriteLine(kdas.Count > 0 && kdas.All(v => v > double.Parse(hasBeenGodRaw)) ? "Yes" : "No");
+
+    return;
+}
 
 // ─── Analyse ─────────────────────────────────────────────────────────────────
 
@@ -210,6 +267,11 @@ void ShowHelp()
     Console.WriteLine("  --smooth <n>                 Moyenne glissante sur n valeurs");
     Console.WriteLine("                                 (normalisation puis lissage, dans cet ordre)");
     Console.WriteLine("  --extract min|max|avg|mme    Extraire un indicateur (avec le détail des matchs)");
+    Console.WriteLine();
+    Console.WriteLine("Seuils (KDA, nécessitent --player)");
+    Console.WriteLine("  --hasCrushed <v>             Yes si un KDA > v dans les parties sélectionnées");
+    Console.WriteLine("  --hasBeenCrushed <v>         Yes si un KDA < v dans les parties sélectionnées");
+    Console.WriteLine("  --hasBeenGod <v>             Yes si tous les KDA > v dans les parties sélectionnées");
     Console.WriteLine();
     Console.WriteLine("Données");
     Console.WriteLine("  --generate <joueur|all>      Simule et exporte les matchs manquants, puis quitte");
