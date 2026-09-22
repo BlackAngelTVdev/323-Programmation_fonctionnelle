@@ -195,20 +195,20 @@ Ensuite on a fait le point sur les exercices proposés la semaine passée:
 
 La synthèse est validée (pour les présents):
 
-|           | Présent | 2.1 | 2.2 | 2.3 | 2.4 | 3.1 | 3.2 | 3.3 |
-| --------- | :-----: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| albert    |   \*    | OK  |     |     |     |     |     |     |
-| damienc   |   \*    | OK  | OK  | OK  |     |     |     |     |
-| damienr   |   \*    | OK  | OK  | OK  | OK  |     |     |     |
-| erdem     |         | OK  | OK  | OK  |     |     |     |     |
-| gianmarco |   \*    | OK  | OK  | OK  |     |     |     |     |
-| gillian   |         | OK  | OK  |     |     |     |     |     |
-| kiril     |   \*    | OK  | OK  | OK  |     |     |     |     |
-| sacha     |   \*    | OK  | OK  |     | OK  |     |     |     |
-| snehan    |   \*    | OK  | OK  | OK  |     |     |     |     |
-| theophile |         | OK  | OK  |     | OK  |     |     |     |
-| tony      |   \*    | OK  | OK  | OK  | OK  |     |     |     |
-| zidane    |         | OK  | OK  |     |     |     |     |     |
+|           | Présent |  2.1  |  2.2  |  2.3  |  2.4  |  3.1  |  3.2  |  3.3  |
+| --------- | :-----: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| albert    |   \*    |  OK   |       |       |       |       |       |       |
+| damienc   |   \*    |  OK   |  OK   |  OK   |       |       |       |       |
+| damienr   |   \*    |  OK   |  OK   |  OK   |  OK   |       |       |       |
+| erdem     |         |  OK   |  OK   |  OK   |       |       |       |       |
+| gianmarco |   \*    |  OK   |  OK   |  OK   |       |       |       |       |
+| gillian   |         |  OK   |  OK   |       |       |       |       |       |
+| kiril     |   \*    |  OK   |  OK   |  OK   |       |       |       |       |
+| sacha     |   \*    |  OK   |  OK   |       |  OK   |       |       |       |
+| snehan    |   \*    |  OK   |  OK   |  OK   |       |       |       |       |
+| theophile |         |  OK   |  OK   |       |  OK   |       |       |       |
+| tony      |   \*    |  OK   |  OK   |  OK   |  OK   |       |       |       |
+| zidane    |         |  OK   |  OK   |       |       |       |       |       |
 
 On a une petite heure (jusqu'à la pause) pour finir ces exercices.
 
@@ -231,20 +231,20 @@ Petit moment d'explication sur les paramètre CLI:
 - Comment les traiter `static void Main(string[] args)`
 
 Situation en fin de matinée:
-| | Présent | 2.1 | 2.2 | 2.3 | 2.4 | 3.1 | 3.2 | 3.3 | 4.1 | 4.2 | 4.3 | 4.4 |
+|           | Présent |  2.1  |  2.2  |  2.3   |  2.4   |  3.1   |  3.2   |  3.3   |  4.1   |  4.2   |  4.3   |  4.4   |
 | --------- | :-----: | :---: | :---: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
-| albert | _ | ok | | **OK** | | | KO | | | | | |
-| damienc | _ | ok | ok | ok | **OK** | **OK** | | | | | | |
-| damienr | _ | ok | ok | ok | ok | **OK** | **OK** | **OK** | **OK** | **OK** | **OK** | **OK** |
-| erdem | | ok | ok | ok | | | | | | | | |
-| gianmarco | _ | ok | ok | ok | | **OK** | **OK** | | | | | |
-| gillian | | ok | ok | | | | | | | | | |
-| kiril | _ | ok | ok | ok | **OK** | **OK** | **OK** | | | | | |
-| sacha | _ | ok | ok | | ok | **OK** | **OK** | **OK** | | | | |
-| snehan | _ | ok | ok | ok | **OK** | **OK** | **OK** | | | | | |
-| theophile | | ok | ok | | ok | | | | | | | |
-| tony | _ | ok | ok | ok | ok | **OK** | **OK** | **OK** | **OK** | | | |
-| zidane | | ok | ok | | | | | | | | | |
+| albert    |    _    |  ok   |       | **OK** |        |        |   KO   |        |        |        |        |        |
+| damienc   |    _    |  ok   |  ok   |   ok   | **OK** | **OK** |        |        |        |        |        |        |
+| damienr   |    _    |  ok   |  ok   |   ok   |   ok   | **OK** | **OK** | **OK** | **OK** | **OK** | **OK** | **OK** |
+| erdem     |         |  ok   |  ok   |   ok   |        |        |        |        |        |        |        |        |
+| gianmarco |    _    |  ok   |  ok   |   ok   |        | **OK** | **OK** |        |        |        |        |        |
+| gillian   |         |  ok   |  ok   |        |        |        |        |        |        |        |        |        |
+| kiril     |    _    |  ok   |  ok   |   ok   | **OK** | **OK** | **OK** |        |        |        |        |        |
+| sacha     |    _    |  ok   |  ok   |        |   ok   | **OK** | **OK** | **OK** |        |        |        |        |
+| snehan    |    _    |  ok   |  ok   |   ok   | **OK** | **OK** | **OK** |        |        |        |        |        |
+| theophile |         |  ok   |  ok   |        |   ok   |        |        |        |        |        |        |        |
+| tony      |    _    |  ok   |  ok   |   ok   |   ok   | **OK** | **OK** | **OK** | **OK** |        |        |        |
+| zidane    |         |  ok   |  ok   |        |        |        |        |        |        |        |        |        |
 
 Cette étape conclut la thématique "Transformer". Le checkpoint #4 portera sur les même contenus théorique, mais devrait être plus facile pour vous avec l'expérience acquise ce matin.
 
@@ -282,4 +282,20 @@ Nous allons voir maintenant des opérations qui synthétisent plusieurs élémen
 
 Pour commencer, on regarde la [théorie de l'agrégation](./supports/source/04-Reduce.md).
 
-Et ensuite, on met tout cela en pratique avec [l'exercice 5](./exos/fil-rouge/esport/05-classement-fold/) du fil rouge
+Et ensuite, on met tout cela en pratique avec [l'exercice 5](./exos/fil-rouge/esport/05-classement-fold/) du fil rouge.
+
+Situation en fin de matinée:
+|           | Présent |  5.1  |  5.2  |  5.3  |
+| --------- | :-----: | :---: | :---: | :---: |
+| albert    |         |       |       |       |
+| damienc   |         |       |       |       |
+| damienr   |         |       |       |       |
+| erdem     |         |       |       |       |
+| gianmarco |         |       |       |       |
+| gillian   |         |       |       |       |
+| kiril     |         |       |       |       |
+| sacha     |         |       |       |       |
+| snehan    |         |       |       |       |
+| theophile |         |       |       |       |
+| tony      |         |       |       |       |
+| zidane    |         |       |       |       |
