@@ -416,14 +416,23 @@ similaires adaptées à chaque format CSV.
 > Le paramètre `seed` peut varier par joueur pour obtenir des profils différents :
 > `GenerateCs2("Kiara", 20, seed: 7)` → profil AWPer avec plus de kills et plus de variance.
 
+> **Piège de la paresse** — `Enumerable.Range(...).Select(...)` n'exécute rien tant que
+> personne ne parcourt la séquence, et le `Random` du générateur est capturé par la lambda.
+> Parcourir deux fois la série (un `Count` puis un export, par exemple) relance donc les
+> tirages et produit **deux jeux de données différents**. Matérialiser le résultat
+> (`.ToList()`) avant de le confier à `DataSeries<T>.From` règle le problème.
+> → [Évaluation paresseuse](../../../../supports/source/02b-filter.md#evaluation-paresseuse-deferred-execution)
+
 ---
 
 ## 2.4 — Interface CLI
 
-Ajouter le flag `--generate <joueur|all>` pour déclencher la génération depuis la ligne de commande.
+Ajouter le flag `--generate <joueur|all>` pour déclencher la génération depuis la ligne de commande,
+et l'ajouter au texte affiché par `--help` (un flag non documenté n'existe pas).
 
 **Avant de coder :** Si `--generate all` est passé, comment obtenir la liste des quatre joueurs ?
 Comment structurer le code pour que `--generate Raphaël` ne génère que ce joueur ?
+Chaque recrue joue à un jeu différent — comment aiguiller vers le bon générateur ?
 Pourquoi utiliser `return` après la génération ?
 
 <details>
@@ -439,17 +448,44 @@ if (args.Contains("--generate"))
         : new[] { target };
 
     foreach (var player in players)
-    {
-        var series = MatchGenerator.GenerateCs2(player, 20);
-        ExportCs2(series.Filter(isValid), $"{player.ToLower()}_generated.csv");
-        Console.WriteLine($"{player} : données générées et exportées");
-    }
+        Generate(player);
+
     return;
+}
+
+// Chaque recrue a son jeu : Raphaël et Kiara en CS2, Dylan en Valorant, Noé en LoL.
+// Les trois générateurs et les trois exports ne retournent pas le même type —
+// d'où l'aiguillage.
+void Generate(string player)
+{
+    var file = $"{player.ToLower()}_generated.csv";
+
+    switch (player)
+    {
+        case "Raphaël":
+        case "Kiara":
+            ExportCs2(MatchGenerator.GenerateCs2(player, 20).Filter(dp => isValidCs2(dp.Value)), file);
+            break;
+
+        case "Dylan":
+            ExportValorant(MatchGenerator.GenerateValorant(player, 20).Filter(dp => isValidValorant(dp.Value)), file);
+            break;
+
+        case "Noé":
+            ExportLol(MatchGenerator.GenerateLol(player, 20).Filter(dp => isValidLol(dp.Value)), file);
+            break;
+
+        default:
+            Console.WriteLine($"Joueur inconnu : {player}");
+            return;
+    }
+
+    Console.WriteLine($"{player} : données générées et exportées dans {file}");
 }
 ```
 
-Le même prédicat `isValid` sert pour tous les joueurs — une fonction stockée dans
-une variable se réutilise comme n'importe quelle valeur.
+Le même prédicat de validité sert pour tous les joueurs d'un même jeu — une fonction stockée
+dans une variable se réutilise comme n'importe quelle valeur.
 
 </details>
 

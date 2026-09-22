@@ -315,11 +315,13 @@ Cette requête est déclarative : elle exprime QUOI faire — pas de boucle, pas
 
 ## Étape 4 — Interface CLI
 
-Ajouter dans `Program.cs` la gestion des flags `--help` et `--game`.
+Ajouter dans `Program.cs` la gestion des flags `--help`, `--version` et `--game`.
 
 **Avant de coder :** Comment détecter la présence d'un flag dans `args` sans librairie externe ?
 Comment récupérer la valeur qui suit immédiatement (`--game valorant`) ?
 Que doit afficher l'application si aucun argument n'est fourni ?
+Quelle différence de traitement entre `--game`, qui attend une valeur, et `--help`, qui n'en
+attend pas ?
 
 <details>
 <summary>Voir la solution</summary>
@@ -327,9 +329,16 @@ Que doit afficher l'application si aucun argument n'est fourni ?
 ```csharp
 static void Main(string[] args)
 {
+    if (args.Contains("--version"))
+    {
+        Console.WriteLine("EsportApp 0.1 — fil rouge LINQ / programmation fonctionnelle");
+        return;
+    }
+
     if (args.Length == 0 || args.Contains("--help"))
     {
         Console.WriteLine("Usage: EsportApp [--game valorant|cs2|lol]");
+        Console.WriteLine("                 [--help] [--version]");
         return;
     }
 
@@ -349,11 +358,20 @@ static void Main(string[] args)
 
 </details>
 
+> **Convention du fil rouge** — le numéro de version suit le numéro d'exercice :
+> `0.1` à la fin de l'exercice 01, `0.4` à la fin de l'exercice 04. `--version` devient
+> ainsi un moyen rapide de vérifier où en est une application rendue par un élève.
+
+Le texte de `--help` est la documentation de l'application : chaque exercice qui ajoute
+un flag doit aussi l'ajouter à ce texte.
+
 ---
 
 ## Vérification
 
 - `valorant.Count` = 3, `cs2.Count` = 3, `lol.Count` = 2 (données en dur)
+- `--version` affiche la version et rend la main immédiatement
+- `--help` (ou aucun argument) affiche l'usage et rend la main immédiatement
 - Tenter de modifier une propriété → erreur de compilation attendue (immutabilité)
 - `DataSeries<T>` ne connaît pas les types `ValorantMatch`, `Cs2Match`, `LolMatch` — généricité validée
 

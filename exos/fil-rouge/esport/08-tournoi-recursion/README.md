@@ -164,8 +164,9 @@ if (args.Contains("--bracket"))
 Récapitulatif de tous les flags reconnus :
 
 ```
---help  --game  --player  --filter  --stat  --window
---rank  --export  --audit  --generate  --bracket
+--help  --version  --game  --player  --filter  --stat  --error
+--normalize  --smooth  --window  --rank  --export  --audit
+--generate  --bracket
 ```
 
 ---
