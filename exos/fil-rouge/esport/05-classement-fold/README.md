@@ -1,11 +1,8 @@
 # Exercice 05 — Classement de saison
 
-> Partie 4 — `.Fold()` + `Statistics()` (hors `DataSeries<T>`, temporaire) + `.SlidingWindow()`
-
 ## Concepts théoriques
 
-- [Thématique 04 — Fold et agrégation](../../../../thematiques/04-fold-agregation.md)
-- [Fold — l'agrégation universelle](../../../../supports/source/04-Reduce.md#fold-—-l-agregation-universelle)
+- [Fold — l'agrégation universelle](../../../../supports/source/04-Reduce.md)
 - [GroupBy — agrégation par clé](../../../../supports/source/04-Reduce.md#groupby)
 
 ## Contexte
@@ -18,22 +15,7 @@ en une seule abstraction.
 
 ---
 
-## Concept FP : Fold — l'agrégation universelle
-
-`Sum`, `Count`, `Max`, `Any`, `All` sont tous des cas particuliers de `Fold`.
-Implémenter `Fold` une seule fois suffit à exprimer n'importe quelle agrégation.
-
-```
-[a, b, c, d] avec seed s et f :
-s → f(s, a) → f(f(s,a), b) → f(f(f(s,a),b), c) → résultat final
-```
-
-→ Théorie : [Reduce / Aggregate](../../../../supports/source/04-Reduce.md) ·
-[Fold — l'agrégation universelle](../../../../supports/source/04-Reduce.md#fold-—-l-agregation-universelle)
-
----
-
-## Étape 1 — Implémenter `.Fold<TResult>()`
+## 5.1 — Implémenter `.Fold<TResult>()`
 
 **Avant de coder :** quelle méthode LINQ fait exactement ce que décrit le schéma ci-dessus —
 accumuler une valeur en appliquant une fonction à chaque élément ?
@@ -81,7 +63,7 @@ Reproduire pour les 4 autres joueurs et afficher le classement.
 
 ---
 
-## Étape 2 — `.SlidingWindow(size)` — progression mensuelle
+## 5.2 — `.SlidingWindow(size)` — progression mensuelle
 
 **Avant de coder :** une fenêtre glissante de taille 5 à partir d'une liste de 13 éléments
 produit combien de fenêtres ? Quelle formule générale ?
@@ -131,7 +113,7 @@ foreach (var avg in progression)
 
 ---
 
-## Étape 3 — `Statistics()` — qui est le plus régulier ?
+## 5.3 — `Statistics()` — qui est le plus régulier ?
 
 > **Simplification temporaire — on sort volontairement de `DataSeries<T>`, comme en exercice 04.**
 > `Statistics` calcule une moyenne et un écart-type — `acc + v`, `v - mean` — des opérations qui
@@ -221,7 +203,7 @@ Qui mérite la place de titulaire aux playoffs ?
 
 ---
 
-## Étape 4 — Interface CLI
+## 5.4 — Interface CLI
 
 Ajouter `--rank` pour afficher le classement des joueurs par KDA moyen,
 et `--window <n>` pour afficher la progression sur des fenêtres glissantes.
@@ -261,7 +243,7 @@ int window = args.Contains("--window")
 
 ---
 
-## Étape bonus (avancé) — GroupBy
+## 5.5 — GroupBy
 
 > Étape optionnelle — pour aller plus loin.
 
