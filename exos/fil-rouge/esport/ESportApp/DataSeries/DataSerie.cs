@@ -104,6 +104,16 @@ namespace DataSeries
                     .ToList());
         }
 
+        // --- Agréger (exercice 05) --------------------------------------------
+        public double MME(Func<T, double> value)
+        {
+            List<double> valeurs = _data.Select(value).ToList();
+            if (valeurs.Count == 0) return 0;
+            if (valeurs.Count == 1) return valeurs[0];
+
+            return valeurs.Aggregate(valeurs[0], (mme, v) => (v + mme) / 2);
+        }
+
         public int Count => _data.Count();
         public IEnumerable<T> Values => _data;
 

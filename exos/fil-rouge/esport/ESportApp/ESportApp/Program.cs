@@ -2,31 +2,28 @@
 //
 // Interface en ligne de commande construite à la main : aucune librairie
 // externe, juste des comparaisons sur le tableau `args`.
-// Flags reconnus à ce stade du fil rouge (fin de l'étape 4) :
+// Flags reconnus à ce stade du fil rouge (étape 5.1) :
 //   --help --version --game --player --filter --stat --normalize --smooth
-//   --generate --error
+//   --generate --error --extract
+// --mme est accepté mais n'a aucun effet seul : seul --extract mme est reconnu.
 
 using DataSeries;
 using ESportApp;
 
-const string version = "0.4";
+const string version = "0.5";
 
 string[] knownFlags =
 {
     "--help", "--version", "--game", "--player", "--filter", "--stat",
-    "--normalize", "--smooth", "--generate", "--error"
+    "--normalize", "--smooth", "--generate", "--error", "--extract", "--mme"
 };
 
 // Les flags qui attendent une valeur juste après eux
-string[] valueFlags = { "--game", "--player", "--filter", "--stat", "--smooth", "--generate", "--error" };
+string[] valueFlags = { "--game", "--player", "--filter", "--stat", "--smooth", "--generate", "--error", "--extract" };
+
+Console.WriteLine($"EsportApp v{version}");
 
 // ─── Flags sans valeur ───────────────────────────────────────────────────────
-
-if (args.Contains("--version"))
-{
-    Console.WriteLine($"EsportApp {version} — fil rouge LINQ / programmation fonctionnelle");
-    return;
-}
 
 if (args.Length == 0 || args.Contains("--help"))
 {
@@ -63,6 +60,10 @@ string errorMode = ValueOf("--error") ?? "soft";
 // --normalize n'attend pas de valeur : sa seule présence suffit
 bool normalize = args.Contains("--normalize");
 
+// --extract min|max|avg|mme : extraire un seul indicateur de la série.
+// Seul --extract mme est reconnu ; --mme seul n'a aucun effet.
+string? extractMode = ValueOf("--extract");
+
 // --smooth attend la taille de la fenêtre ; 0 signifie « pas de lissage »
 int smoothWindow = 0;
 if (args.Contains("--smooth") && !int.TryParse(ValueOf("--smooth"), out smoothWindow))
@@ -86,6 +87,7 @@ Dictionary<string, Func<IMatch, double>> selectors = new Dictionary<string, Func
 
 string[] games = { "valorant", "cs2", "lol" };
 string[] errorModes = { "strict", "soft", "hard" };
+string[] extractModes = { "min", "max", "avg", "mme" };
 
 if (game != null && !games.Contains(game))
 {
@@ -108,6 +110,12 @@ if (!selectors.ContainsKey(statName))
 if (!errorModes.Contains(errorMode))
 {
     Console.WriteLine($"Mode d'erreur inconnu : {errorMode} (attendu : {string.Join(", ", errorModes)})");
+    return;
+}
+
+if (extractMode != null && !extractModes.Contains(extractMode))
+{
+    Console.WriteLine($"Indicateur à extraire inconnu : {extractMode} (attendu : {string.Join(", ", extractModes)})");
     return;
 }
 
@@ -172,9 +180,6 @@ Func<LolMatch, bool> lolAberrant = m =>
     m.Assists < 0 ||
     m.Cs < 0;
 
-Console.WriteLine($"Team Helvetia — jeu : {game ?? "tous"} | joueur : {player ?? "tous"} | "
-                + $"filtre : {filterMode} | stat : {statName}{(normalize ? " normalisé" : "")}"
-                + $"{(smoothWindow > 0 ? $" lissé({smoothWindow})" : "")} | erreurs : {errorMode}");
 Console.WriteLine();
 
 if (game == null || game == "valorant")
@@ -204,6 +209,7 @@ void ShowHelp()
     Console.WriteLine("  --normalize                  Ramène l'indicateur dans [0.0, 1.0]");
     Console.WriteLine("  --smooth <n>                 Moyenne glissante sur n valeurs");
     Console.WriteLine("                                 (normalisation puis lissage, dans cet ordre)");
+    Console.WriteLine("  --extract min|max|avg|mme    Extraire un indicateur (avec le détail des matchs)");
     Console.WriteLine();
     Console.WriteLine("Données");
     Console.WriteLine("  --generate <joueur|all>      Simule et exporte les matchs manquants, puis quitte");
@@ -267,6 +273,42 @@ bool Report<T>(string label,
     // Normalize fait le même travail que Transform, en ramenant en plus le
     // résultat dans [0.0, 1.0] : inutile d'enchaîner les deux.
     Func<DataPoint<T>, double> selecteur = dp => selectors[statName](dp.Value);
+
+    if (extractMode != null)
+    {
+        if (retenus.Count == 0)
+        {
+            Console.WriteLine("  aucun match retenu — rien à extraire");
+            Console.WriteLine();
+            return true;
+        }
+
+        foreach (DataPoint<T> point in retenus.Values)
+            Console.WriteLine($"  {point.Timestamp:yyyy-MM-dd}  {point.Value.Player,-8}  {statName} = {selecteur(point):F2}");
+
+        double resultat = extractMode switch
+        {
+            "min"     => retenus.Values.Select(selecteur).Min(),
+            "max"     => retenus.Values.Select(selecteur).Max(),
+            "avg" => retenus.Values.Select(selecteur).Average(),
+            "mme"     => retenus.MME(selecteur),
+            _         => throw new InvalidOperationException($"Indicateur inconnu : {extractMode}")
+        };
+
+        string libelle = extractMode switch
+        {
+            "min"     => "Min",
+            "max"     => "Max",
+            "avg" => "Moyenne",
+            "mme"     => "MME",
+            _         => extractMode
+        };
+        string suffixe = extractMode == "mme" ? " - forme du moment" : "";
+
+        Console.WriteLine($"  {libelle} ({statName}){suffixe} : {resultat:F2}");
+        Console.WriteLine();
+        return true;
+    }
 
     DataSerie<double> valeurs = normalize
         ? retenus.Normalize(selecteur)
