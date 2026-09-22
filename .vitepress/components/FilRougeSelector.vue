@@ -5,8 +5,9 @@ const { active, set } = useFilRouge()
 
 // Liste des fil rouges disponibles — à terme auto-découverts depuis exos/fil-rouge/
 const options = [
-  { id: 'esport', label: 'Esport' },
-  { id: 'meteo',  label: 'Météo' },
+  { id: 'esport',     label: 'Esport Advanced' },
+  { id: 'esportEasy', label: 'Esport Easy' },
+  { id: 'meteo',      label: 'Météo' },
 ]
 </script>
 

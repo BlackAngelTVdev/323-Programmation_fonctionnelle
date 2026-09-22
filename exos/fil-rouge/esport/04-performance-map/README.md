@@ -1,6 +1,6 @@
 # Exercice 04 — Calculer le KDA par joueur
 
-> Partie 3 — `.Transform()` + `.Normalize()` + `.Smooth()`
+> Partie 3 — `.Transform()` + `Normalize()` + `Smooth()` (hors `DataSeries<T>`, temporaire)
 
 ## Concepts théoriques
 
@@ -184,7 +184,7 @@ Observer la closure :
 
 ```csharp
 int window = 3;
-var smoothed = kdaLea.Smooth(window);
+var smoothed = MathHelpers.Smooth(kdaLea, window);
 window = 10; // Sans effet — window a été copiée à l'appel de Smooth (passage d'argument)
 ```
 

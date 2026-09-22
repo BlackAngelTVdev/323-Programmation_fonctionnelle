@@ -14,7 +14,7 @@ Après avoir filtré des collections, l'étape naturelle est de les transformer.
 - [Exemple introductif](../supports/source/03-MapIntro.md)
 - [Condensé PPT](../supports/source/03-Map.pptx)
 - [Théorie complète](../supports/source/03-Map.md)
-- [Kahoot](https:/create.kahoot.it/share/03-map/1c5c732d-0506-412e-a923-fa261effdfcc)
+- [Kahoot](https://create.kahoot.it/share/03-map/1c5c732d-0506-412e-a923-fa261effdfcc)
 
 **Particularités utiles pour les activités**
 

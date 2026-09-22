@@ -174,4 +174,4 @@ composabilité des flags = composabilité du pipeline.
 - `valorant.Count` reste 25 après `Filter` (immuabilité)
 - `RemoveOutliers` sur les données réelles ne retire aucun match (données déjà propres)
 - `RemoveOutliers` sur les données générées (exercice 02) retire quelques matchs impossibles
-- L'observation de la paresse confirme que le prédicat n'est pas appelé avant matérialisation
+- Les deux expériences confirment que `DataSeries<T>` matérialise immédiatement (snapshot) — contrairement à un pipeline LINQ pur

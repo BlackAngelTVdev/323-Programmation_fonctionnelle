@@ -1,6 +1,6 @@
 # Exercice 05 — Classement de saison
 
-> Partie 4 — `.Fold()` + `Statistics()` (hors `DataSeries<T>`, temporaire) + `.SlidingWindow()`
+> Partie 4 — `.Fold()` + `.Statistics()` + `.SlidingWindow()`
 
 ## Concepts théoriques
 
@@ -33,10 +33,9 @@ s → f(s, a) → f(f(s,a), b) → f(f(f(s,a),b), c) → résultat final
 
 ---
 
-## Étape 1 — Implémenter `.Fold<TResult>()`
+## Étape 1 — Implémenter `.Fold()`
 
-**Avant de coder :** quelle méthode LINQ fait exactement ce que décrit le schéma ci-dessus —
-accumuler une valeur en appliquant une fonction à chaque élément ?
+**Avant de coder :** quelle méthode LINQ fait exactement ce que décrit le schéma ci-dessus ?
 
 <details>
 <summary>Indice</summary>
@@ -47,7 +46,7 @@ La méthode de la bibliothèque n'a qu'à déléguer à `Aggregate`.
 </details>
 
 ```csharp
-public TResult Fold<TResult>(TResult seed, Func<TResult, T, TResult> combiner)
+public double Fold(double seed, Func<double, double, double> combiner)
 {
     // ...
 }
@@ -57,19 +56,26 @@ public TResult Fold<TResult>(TResult seed, Func<TResult, T, TResult> combiner)
 <summary>Voir la solution</summary>
 
 ```csharp
-public TResult Fold<TResult>(TResult seed, Func<TResult, T, TResult> combiner)
-    => _data.Aggregate(seed, (acc, dp) => combiner(acc, dp.Value));
+public double Fold(double seed, Func<double, double, double> combiner)
+    => _data.Aggregate(seed, (acc, d) => combiner(acc, d.Value));
 ```
+
+`_data` stocke des `(DateTime, double)` — le combinateur ne travaille que sur les doubles.
+
+> **Différence avec esport :** `DataSeries<T>.Fold<TResult>` est générique sur le type
+> du résultat : `TResult Fold<TResult>(TResult seed, Func<TResult, T, TResult> combiner)`.
+> Cela permet, par exemple, d'accumuler dans un `string` ou un objet personnalisé.
+> Ici, le seed et le résultat sont toujours des `double` — plus simple, mais moins flexible.
 
 </details>
 
 Réécrire les agrégations classiques avec `Fold` sur les KDA de Léa :
 
 ```csharp
-var kdaValues = kdaLea; // DataSeries<double>
+var kdaValues = kdaLea; // StatSeries
 
 var sum   = kdaValues.Fold(0.0, (acc, val) => acc + val);
-var count = kdaValues.Fold(0,   (acc, _)   => acc + 1);
+var count = kdaValues.Fold(0.0, (acc, _)   => acc + 1);
 var best  = kdaValues.Fold(double.MinValue, (acc, val) => val > acc ? val : acc);
 
 var mean = sum / count;
@@ -94,10 +100,10 @@ produit combien de fenêtres ? Quelle formule générale ?
 </details>
 
 ```csharp
-public IEnumerable<DataSeries<T>> SlidingWindow(int size)
+public IEnumerable<StatSeries> SlidingWindow(int size)
 {
-    var values = _data.ToList();
-    return Enumerable.Range(0, Math.Max(0, values.Count - size + 1))
+    var points = _data.ToList();
+    return Enumerable.Range(0, Math.Max(0, points.Count - size + 1))
         .Select(i => // extraire une fenêtre de `size` éléments à partir de l'indice i
         );
 }
@@ -107,11 +113,11 @@ public IEnumerable<DataSeries<T>> SlidingWindow(int size)
 <summary>Voir la solution</summary>
 
 ```csharp
-public IEnumerable<DataSeries<T>> SlidingWindow(int size)
+public IEnumerable<StatSeries> SlidingWindow(int size)
 {
-    var values = _data.ToList();
-    return Enumerable.Range(0, Math.Max(0, values.Count - size + 1))
-        .Select(i => DataSeries<T>.From(values.Skip(i).Take(size)));
+    var points = _data.ToList();
+    return Enumerable.Range(0, Math.Max(0, points.Count - size + 1))
+        .Select(i => new StatSeries(points.Skip(i).Take(size)));
 }
 ```
 
@@ -131,57 +137,31 @@ foreach (var avg in progression)
 
 ---
 
-## Étape 3 — `Statistics()` — qui est le plus régulier ?
-
-> **Simplification temporaire — on sort volontairement de `DataSeries<T>`, comme en exercice 04.**
-> `Statistics` calcule une moyenne et un écart-type — `acc + v`, `v - mean` — des opérations qui
-> n'ont de sens que pour `double`. `DataSeries<T>` reste générique, donc cette méthode ne peut
-> pas être une méthode d'instance de `DataSeries<T>` (le compilateur la refuserait pour
-> `DataSeries<ValorantMatch>`, par exemple). `Statistics` rejoint
-> [`Normalize`](../04-performance-map/README.md#etape-2-—-normalize-—-comparer-entre-jeux) et `Smooth`
-> dans l'utilitaire `DataSeries/MathHelpers.cs`, appelée explicitement — `MathHelpers.Statistics(series)`
-> plutôt que `series.Statistics()`. Les trois seront promues méthodes d'extension à l'exercice 06.
-
-**Rappel — `Normalize()` en un coup d'œil** (formule : `(valeur - min) / (max - min)`) :
-
-| Match | KDA brut | KDA normalisé |
-|---|---|---|
-| 1 | 1.2 | 0.00 |
-| 2 | 1.8 | 0.25 |
-| 3 | 3.6 | 1.00 |
-| 4 | 2.4 | 0.50 |
-
-Sur cette série, `min = 1.2` et `max = 3.6` : le minimum devient `0`, le maximum devient `1`,
-et les autres valeurs se placent proportionnellement entre les deux. Chaque série est normalisée
-indépendamment — c'est ce qui permet de comparer Raphaël (CS2) et Léa (Valorant) malgré des
-échelles de KDA brutes différentes. Détails : [Normalize — exercice 04](../04-performance-map/README.md#etape-2-—-normalize-—-comparer-entre-jeux).
+## Étape 3 — `.Statistics()` — qui est le plus régulier ?
 
 ```csharp
 public class SeriesStats
 {
-    public double Min { get; }
-    public double Max { get; }
-    public double Mean { get; }
+    public double Min    { get; }
+    public double Max    { get; }
+    public double Mean   { get; }
     public double StdDev { get; }
 
     public SeriesStats(double min, double max, double mean, double stdDev)
     {
-        Min = min;
-        Max = max;
-        Mean = mean;
+        Min    = min;
+        Max    = max;
+        Mean   = mean;
         StdDev = stdDev;
     }
 }
 
-public static class MathHelpers // suite (Normalize, Smooth — exercice 04)
+public SeriesStats Statistics()
 {
-    public static SeriesStats Statistics(DataSeries<double> series)
-    {
-        var values   = series.Values.ToList();
-        var mean     = // ...
-        var variance = // ...
-        return new SeriesStats(min: /* ... */, max: /* ... */, mean: mean, stdDev: /* ... */);
-    }
+    var nums     = _data.Select(d => d.Value).ToList();
+    var mean     = // ...
+    var variance = // ...
+    return new SeriesStats(min: /* ... */, max: /* ... */, mean: mean, stdDev: /* ... */);
 }
 ```
 
@@ -189,20 +169,17 @@ public static class MathHelpers // suite (Normalize, Smooth — exercice 04)
 <summary>Voir la solution</summary>
 
 ```csharp
-public static class MathHelpers // suite (Normalize, Smooth — exercice 04)
+public SeriesStats Statistics()
 {
-    public static SeriesStats Statistics(DataSeries<double> series)
-    {
-        var values   = series.Values.ToList();
-        var mean     = values.Aggregate(0.0, (acc, v) => acc + v) / values.Count;
-        var variance = values.Aggregate(0.0, (acc, v) => acc + Math.Pow(v - mean, 2)) / values.Count;
-        return new SeriesStats(
-            min:    values.Min(),
-            max:    values.Max(),
-            mean:   mean,
-            stdDev: Math.Sqrt(variance)
-        );
-    }
+    var nums     = _data.Select(d => d.Value).ToList();
+    var mean     = nums.Aggregate(0.0, (acc, v) => acc + v) / nums.Count;
+    var variance = nums.Aggregate(0.0, (acc, v) => acc + Math.Pow(v - mean, 2)) / nums.Count;
+    return new SeriesStats(
+        min:    nums.Min(),
+        max:    nums.Max(),
+        mean:   mean,
+        stdDev: Math.Sqrt(variance)
+    );
 }
 ```
 
@@ -211,8 +188,8 @@ public static class MathHelpers // suite (Normalize, Smooth — exercice 04)
 Comparer les profils — un écart-type faible = joueur régulier :
 
 ```csharp
-var statsLea     = MathHelpers.Statistics(kdaLea);
-var statsRaphael = MathHelpers.Statistics(kdaRaphael);
+var statsLea     = kdaLea.Statistics();
+var statsRaphael = kdaRaphael.Statistics();
 Console.WriteLine($"Léa     — KDA moy : {statsLea.Mean:F2}, écart-type : {statsLea.StdDev:F2}");
 Console.WriteLine($"Raphaël — KDA moy : {statsRaphael.Mean:F2}, écart-type : {statsRaphael.StdDev:F2}");
 ```
@@ -266,11 +243,11 @@ int window = args.Contains("--window")
 > Étape optionnelle — pour aller plus loin.
 
 Le classement de l'étape 4 construit les moyennes joueur par joueur, à la main.
-`GroupBy` fait le partitionnement automatiquement : les stats **par joueur** en un seul pipeline.
+`GroupBy` fait le partitionnement automatiquement :
 
 ```csharp
 // Tous les matchs Valorant (Léa + Dylan) — stats par joueur en un pipeline
-var ranking = valorant.Values
+var ranking = valorant.Matches
     .GroupBy(m => m.Player)
     .Select(g => new
     {
@@ -296,5 +273,5 @@ partition — un `Fold` par clé.
 
 - `Fold` sur liste vide retourne `seed`
 - `SlidingWindow(5)` sur 13 matchs produit 9 fenêtres (13 - 5 + 1 = 9)
-- `MathHelpers.Statistics(series).Mean` correspond à `series.Fold(0.0, (acc,v)=>acc+v) / series.Count`
+- `Statistics().Mean` correspond à `Fold(0.0, (acc,v)=>acc+v) / Count`
 - Les écarts-types permettent de distinguer les profils réguliers des profils variables
