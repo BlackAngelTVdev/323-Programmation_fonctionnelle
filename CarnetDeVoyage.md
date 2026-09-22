@@ -279,3 +279,7 @@ Nous allons voir maintenant des opérations qui synthétisent plusieurs élémen
 | Réduction générale   | collection | valeur/objet          | `Aggregate`                             |
 | Regroupement         | collection | collection de groupes | `GroupBy`                               |
 | Indexation           | collection | autre structure       | `ToDictionary`, `ToHashSet`             |
+
+Pour commencer, on regarde la [théorie de l'agrégation](./supports/source/04-Reduce.md).
+
+Et ensuite, on met tout cela en pratique avec [l'exercice 5](./exos/fil-rouge/esport/05-classement-fold/) du fil rouge
