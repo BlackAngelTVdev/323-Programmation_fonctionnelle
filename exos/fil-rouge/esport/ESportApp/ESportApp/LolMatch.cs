@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ESportApp
 {
-    public class LolMatch
+    public class LolMatch : IMatch
     {
         public LolMatch(string player, string champion, int kills, int deaths, int assists, int cs, int visionScore, bool won)
         {

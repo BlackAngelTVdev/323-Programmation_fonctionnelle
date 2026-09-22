@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataSeries
+namespace ESportApp
 {
-    public class Cs2Match
+    public class Cs2Match : IMatch
     {
         public string Player { get; }
         public string Map { get; }

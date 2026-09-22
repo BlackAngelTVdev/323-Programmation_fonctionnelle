@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataSeries
+namespace ESportApp
 {
-    public class ValorantMatch
+    public class ValorantMatch : IMatch
     {
         public string Player { get; }
         public string Agent { get; }
