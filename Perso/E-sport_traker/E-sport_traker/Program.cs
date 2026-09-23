@@ -5,34 +5,21 @@ Func<Cs2Match, bool> isValid = m =>
     m.Kills + m.Assists <= 50 &&
     m.Deaths >= 1;
 
-if (args.Contains("--generate"))
+// Insensible à la casse : --GENERATE, --Player, -H... sont ramenés en minuscules
+// avant tout test sur les tokens (les valeurs restent intactes).
+args = CommandLine.NormalizeFlags(args);
+
+// Aide demandée, avec ou sans autres flags.
+if (args.Contains("--help") || args.Contains("-h"))
 {
-    string target = args[Array.IndexOf(args, "--generate") + 1];
-
-    string[] players = target == "all"
-        ? new[] { "Raphaël", "Kiara", "Dylan", "Noé" }
-        : new[] { target };
-
-    foreach (string player in players)
-    {
-        string path = $"./data/{player.ToLower()}_generated.csv";
-        DataSeries<Cs2Match> series = MatchGenerator.GenerateCs2(player, 20);
-        CommandLine.Cs2(path, $"{player} (généré)").Save(series.Filter(isValid));
-        Console.WriteLine($"{player} : données générées et exportées");
-    }
+    CommandLine.ShowHelp();
     return;
 }
 
-// 3.3 — CLI : --player <nom> --filter wins|losses|all --error [strict|soft|hard]
+// 3.3 — CLI : tout le reste passe par le switch de CommandLine.Run, qui fait
+// correspondre chaque case à sa méthode (--generate, --extract, --has*...).
 if (args.Any(arg => arg.StartsWith("--")))
 {
-    // Aide demandée, avec ou sans autres flags.
-    if (args.Contains("--help") || args.Contains("-h"))
-    {
-        CommandLine.ShowHelp();
-        return;
-    }
-
     CommandLine.Run(args);
     return;
 }

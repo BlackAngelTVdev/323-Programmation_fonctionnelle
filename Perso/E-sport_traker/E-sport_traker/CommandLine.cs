@@ -61,7 +61,7 @@ namespace E_sport_traker
             string green = "\u001b[38;2;74;222;128m";
             string gray = "\u001b[38;2;148;163;184m";
 
-            int width = 80; // Largeur exacte de la boîte intérieur
+            int width = 90; // Largeur exacte de la boîte intérieur
 
             // Fonction locale pour formater une ligne avec une bordure droite dynamique
             void PrintLine(string content)
@@ -84,12 +84,12 @@ namespace E_sport_traker
             // Section Utilisation
             PrintLine("");
             PrintLine($"{yellow}{bold}UTILISATION :{reset}");
-            PrintLine($"  {green}dotnet run{reset}                                {gray}Mode démo (étapes 3.1, 3.2 et 4){reset}");
-            PrintLine($"  {green}dotnet run -- --generate <joueur|all>{reset}");
+            PrintLine($"  {green}E-sport_traker.exe{reset}                                {gray}Mode démo (étapes 3.1, 3.2 et 4){reset}");
+            PrintLine($"  {green}E-sport_traker.exe --generate <joueur|all>{reset}");
             PrintLine($"                                              {gray}Génère 20 matchs CS2 fictifs{reset}");
             PrintLine($"                                              {gray}dans data/<joueur>_generated.csv{reset}");
-            PrintLine($"  {green}dotnet run -- [options]{reset}                   {gray}Analyse les 3 jeux (csv){reset}");
-            PrintLine($"  {green}dotnet run -- --player <joueur> [options]{reset}");
+            PrintLine($"  {green}E-sport_traker.exe [options]{reset}                   {gray}Analyse les 3 jeux (csv){reset}");
+            PrintLine($"  {green}E-sport_traker.exe --player <joueur> [options]{reset}");
             PrintLine($"                                              {gray}Analyse le jeu principal + data{reset}");
 
             // Section Options
@@ -103,17 +103,10 @@ namespace E_sport_traker
             PrintLine($"  {cyan}--stat <metrique>{reset}   Métrique affichée : {yellow}kda{reset}, {green}kills{reset}, {magenta}assists{reset}");
             PrintLine($"  {cyan}--game <jeu>{reset}       Un seul jeu : {yellow}valorant{reset}, {green}cs2{reset}, {magenta}lol{reset} {dim}(requis avec --extract){reset}");
             PrintLine($"  {cyan}--extract <indic>{reset}  Indicateur : {yellow}min{reset}, {yellow}max{reset}, {yellow}avg{reset}, {yellow}mme{reset} {dim}(MME = forme du moment){reset}");
+            PrintLine($"  {cyan}--hasCrushed <v>{reset}   {yellow}Yes{reset} si au moins un KDA > v {dim}(moment d'invincibilité){reset}");
+            PrintLine($"  {cyan}--hasBeenCrushed <v>{reset} {yellow}Yes{reset} si au moins un KDA < v {dim}(défaillance grave){reset}");
+            PrintLine($"  {cyan}--hasBeenGod <v>{reset}   {yellow}Yes{reset} si tous les KDA > v {dim}(--player requis){reset}");
             PrintLine($"  {cyan}-h, --help{reset}          Affiche cette aide.");
-
-            // Section Exemples
-            PrintLine("");
-            PrintLine($"{green}{bold}EXEMPLES :{reset}");
-            PrintLine($"  {gray}dotnet run -- --generate all{reset}");
-            PrintLine($"  {gray}dotnet run -- --player Léa --filter wins{reset}");
-            PrintLine($"  {gray}dotnet run -- --error hard{reset}");
-            PrintLine($"  {gray}dotnet run -- --game cs2 --player Raphaël --extract min --stat kills{reset}");
-            PrintLine($"  {gray}dotnet run -- --game cs2 --player Kiara --extract mme --stat kills{reset}");
-            PrintLine($"  {gray}dotnet run -- --player Raphaël --filter wins --error soft --stat kills{reset}");
 
             // Bordure inférieure
             Console.WriteLine($"{purple}╚{new string('═', width + 2)}╝{reset}");
@@ -122,7 +115,7 @@ namespace E_sport_traker
         // --- Dispatch fonctionnel : chaque critère est une donnée, pas une branche.
         // Ajouter un critère = ajouter une entrée ici, sans toucher au pipeline.
         public static readonly IReadOnlyDictionary<string, Func<IMatch, bool>> WinFilters =
-            new Dictionary<string, Func<IMatch, bool>>
+            new Dictionary<string, Func<IMatch, bool>>(StringComparer.OrdinalIgnoreCase)
             {
                 ["all"] = _ => true,
                 ["wins"] = m => m.Won,
@@ -133,7 +126,7 @@ namespace E_sport_traker
         // Un Func<ICombatMatch, double> est une valeur comme une autre : ajouter une stat
         // = une ligne ici, et l'appel à Transform ne change jamais.
         public static readonly IReadOnlyDictionary<string, Func<ICombatMatch, double>> StatSelectors =
-            new Dictionary<string, Func<ICombatMatch, double>>
+            new Dictionary<string, Func<ICombatMatch, double>>(StringComparer.OrdinalIgnoreCase)
             {
                 ["kda"] = m => Metrics.Kda(m.Kills, m.Assists, m.Deaths),
                 ["kills"] = m => m.Kills,
@@ -144,7 +137,7 @@ namespace E_sport_traker
         // valeurs en UN nombre. min/max/avg sont des plis classiques ; mme est le
         // pli exponentiel de DataSeries.MME, qui privilégie les valeurs récentes.
         public static readonly IReadOnlyDictionary<string, Func<DataSeries<double>, double>> Extractors =
-            new Dictionary<string, Func<DataSeries<double>, double>>
+            new Dictionary<string, Func<DataSeries<double>, double>>(StringComparer.OrdinalIgnoreCase)
             {
                 ["min"] = s => s.Values.Min(),
                 ["max"] = s => s.Values.Max(),
@@ -190,7 +183,7 @@ namespace E_sport_traker
         };
 
         public static readonly IReadOnlyDictionary<string, ErrorPolicy> ErrorPolicies =
-            new Dictionary<string, ErrorPolicy>
+            new Dictionary<string, ErrorPolicy>(StringComparer.OrdinalIgnoreCase)
             {
                 ["none"] = new("none", Clean: false, Save: false, Stop: false),
                 ["strict"] = new("strict", Clean: false, Save: false, Stop: true),
@@ -236,23 +229,67 @@ namespace E_sport_traker
                     $"{m.Timestamp:yyyy-MM-dd},{m.Player},{m.Champion},,{m.Kills}," +
                     $"{m.Deaths},{m.Assists},{m.Cs},{m.VisionScore},{m.Won.ToString().ToLower()}");
 
-        private sealed record Options(string? Player, Func<IMatch, bool> Filter, string FilterName,
+        // 5.2 — Interrogation booléenne sur les KDA : crushed (un KDA > valeur),
+    // beenCrushed (un KDA < valeur), beenGod (tous les KDA > valeur).
+    public sealed record HasQuery(string Name, Func<IEnumerable<double>, bool> Holds, string Question);
+
+    private sealed record Options(string? Player, Func<IMatch, bool> Filter, string FilterName,
                                       ErrorPolicy Policy, Func<ICombatMatch, double> Stat, string StatName,
-                                      string? Game, string? Extract, string ExtractorName);
+                                      string? Game, string? Extract, string ExtractorName,
+                                      HasQuery? Has, double HasValue);
 
         public static void Run(string[] args)
         {
+            args = NormalizeFlags(args);
+
             Options? options = Parse(args);
             if (options is null) return;
 
-            // 5.1 — Extraction d'indicateur : chemin dédié (un seul jeu, détail
-            // ligne à ligne puis l'indicateur), le résumé multi-jeux ne s'applique pas.
-            if (options.Extract is not null)
+            // Un seul switch : le flag de mode présent appelle SA méthode.
+            // Un case = un mode ; aucun flag de mode = analyse multi-jeux.
+            switch (args)
             {
-                RunExtraction(options);
-                return;
-            }
+                case var a when a.Contains("--generate"):
+                    RunGenerate(a);
+                    break;
 
+                case var a when a.Contains("--hascrushed") || a.Contains("--hasbeencrushed") || a.Contains("--hasbeengod"):
+                    RunHasQuery(options);
+                    break;
+
+                case var a when a.Contains("--extract"):
+                    RunExtraction(options);
+                    break;
+
+                default:
+                    RunAnalysis(options);
+                    break;
+            }
+        }
+
+        // --generate <joueur|all> : 20 matchs CS2 fictifs par joueur, dans data/.
+        private static void RunGenerate(string[] args)
+        {
+            Func<Cs2Match, bool> isValid = m => m.Kills + m.Assists <= 50 && m.Deaths >= 1;
+
+            string target = FlagValue(args, "--generate") ?? "all";
+            string[] players = string.Equals(target, "all", StringComparison.OrdinalIgnoreCase)
+                ? new[] { "Raphaël", "Kiara", "Dylan", "Noé" }
+                : new[] { target };
+
+            foreach (string player in players)
+            {
+                string path = $"./data/{player.ToLower()}_generated.csv";
+                DataSeries<Cs2Match> series = MatchGenerator.GenerateCs2(player, 20);
+                Cs2(path, $"{player} (généré)").Save(series.Filter(isValid));
+                Console.WriteLine($"{player} : données générées et exportées");
+            }
+        }
+
+        // Analyse multi-jeux (comportement historique) : rapport par jeu, outliers,
+        // nettoyage éventuel, résumé final.
+        private static void RunAnalysis(Options options)
+        {
             Console.WriteLine($"--player {options.Player ?? "(tous)"} | --filter {options.FilterName} | --error {options.Policy.Name} | --stat {options.StatName}");
             Console.WriteLine();
 
@@ -280,6 +317,11 @@ namespace E_sport_traker
 
         private static Options? Parse(string[] args)
         {
+            // Insensible à la casse : chaque token commençant par « -- » est un FLAG,
+            // ramené en minuscules via un switch ; les valeurs (joueurs, chemins)
+            // passent intactes. --HELP, --Player, --GENERATE deviennent leurs canons.
+            args = NormalizeFlags(args);
+
             // Aide demandée : on affiche et on ne lance aucune analyse.
             if (args.Any(a => a is "--help" or "-h"))
             {
@@ -312,6 +354,42 @@ namespace E_sport_traker
                 return null;
             }
 
+            // 5.2 — Flags --has* : valeur numérique + --player obligatoire (on ne
+            // juge pas « le moment d'invincibilité » d'une équipe entière). Le nom du
+            // flag choisit la fonction de réduction (Any/All) : ajout = une entrée.
+            HasQuery? has = null;
+            double hasValue = 0;
+            (string flag, HasQuery query)[] hasFlags =
+            {
+                ("--hasCrushed", new HasQuery("hasCrushed",
+                    ks => ks.Any(k => k > hasValue),
+                    "a-t-il eu des moments d'invincibilité ?")),
+                ("--hasBeenCrushed", new HasQuery("hasBeenCrushed",
+                    ks => ks.Any(k => k < hasValue),
+                    "a-t-il eu des défaillances graves ?")),
+                ("--hasBeenGod", new HasQuery("hasBeenGod",
+                    ks => ks.All(k => k > hasValue),
+                    "a-t-il été en mode dieu sur toute la sélection ?")),
+            };
+            foreach ((string flag, HasQuery query) in hasFlags)
+            {
+                if (!args.Contains(flag, StringComparer.OrdinalIgnoreCase)) continue;
+
+                if (player is null)
+                {
+                    Console.WriteLine($"{flag} exige --player <nom> : on interroge la carrière d'un joueur, pas d'une équipe.");
+                    return null;
+                }
+                string? raw = FlagValue(args, flag);
+                if (raw is null || !double.TryParse(raw, out hasValue))
+                {
+                    Console.WriteLine($"{flag} exige une valeur numérique, ex. : {flag} 3");
+                    return null;
+                }
+                has = query;
+                break;
+            }
+
             // --game : restreint l'analyse à un seul jeu (cs2 | valorant | lol).
             string? game = FlagValue(args, "--game");
             if (game is not null && !GameLoaders.ContainsKey(game))
@@ -337,12 +415,25 @@ namespace E_sport_traker
             }
 
             return new Options(player, filter, filterName, policy, stat, statName,
-                               game, extract, extract ?? "");
+                               game, extract, extract ?? "", has, hasValue);
         }
 
+        // Insensibilité à la casse des FLAGS : tout token qui commence par « - »
+        // (donc « -- » aussi) est ramené en minuscules par le switch ; les valeurs
+        // (joueurs, seuils) passent intactes. --HELP, --Player deviennent leurs canons.
+        public static string[] NormalizeFlags(IEnumerable<string> args) => args
+            .Select(arg => arg switch
+            {
+                _ when arg.StartsWith("-") => arg.ToLowerInvariant(),
+                _ => arg,
+            })
+            .ToArray();
+
+        // Le flag lui-même est insensible à la casse (--Player vaut --player),
+        // la valeur qui suit n'est jamais touchée.
         private static string? FlagValue(string[] args, string flag)
         {
-            int i = Array.IndexOf(args, flag);
+            int i = Array.FindIndex(args, a => string.Equals(a, flag, StringComparison.OrdinalIgnoreCase));
             if (i < 0) return null;
             int next = i + 1;
             return next < args.Length && !args[next].StartsWith("--") ? args[next] : null;
@@ -481,6 +572,59 @@ namespace E_sport_traker
             "avg" => $"Moyenne ({stat})",
             _ => $"MME ({stat}) - forme du moment",
         };
+
+        // 5.2 — Les jeux où chercher les matchs d'un joueur : son jeu principal
+        // (roster.csv) puis ses données générées. Avec --game, on se restreint.
+        private static IEnumerable<MatchDataset<ICombatMatch>> PlayerDatasets(string player, string? game)
+        {
+            if (game is not null)
+            {
+                yield return GameLoaders[game](CsvPath(game));
+                yield break;
+            }
+
+            string primary = Roster().TryGetValue(player, out string? g) ? g : "CS2";
+            yield return primary.ToLowerInvariant() switch
+            {
+                "valorant" => GameLoaders["valorant"]("data/valorant.csv"),
+                "lol" => GameLoaders["lol"]("data/lol.csv"),
+                _ => GameLoaders["cs2"]("data/cs2.csv"),
+            };
+
+            string generated = $"data/{player.ToLower()}_generated.csv";
+            if (File.Exists(generated))
+                yield return GameLoaders["cs2"](generated);
+        }
+
+        // 5.2 — Question booléenne du staff : les KDA des parties sélectionnées
+        // traversent le prédicat de la requête (Any/All), la réponse est Yes ou No.
+        private static void RunHasQuery(Options options)
+        {
+            HasQuery query = options.Has!;
+            Console.WriteLine($"--player {options.Player} | --filter {options.FilterName} | --{query.Name} {options.HasValue}");
+            Console.WriteLine();
+
+            List<double> kdas = new();
+            foreach (MatchDataset<ICombatMatch> ds in PlayerDatasets(options.Player!, options.Game))
+            {
+                DataSeries<double> kda = ds.Series
+                    .Filter(options.Filter)
+                    .Filter(m => string.Equals(m.Player, options.Player, StringComparison.OrdinalIgnoreCase))
+                    .Sanitize(ds.IsOutlier)
+                    .Transform(options.Stat);
+                kdas.AddRange(kda.Values);
+            }
+
+            if (kdas.Count == 0)
+            {
+                Console.WriteLine($"Aucune partie sélectionnée pour {options.Player} : question sans objet.");
+                return;
+            }
+
+            Console.WriteLine($"{kdas.Count} partie(s) sélectionnée(s) — KDA de {kdas.Min():F2} à {kdas.Max():F2} (seuil : {options.HasValue}).");
+            Console.WriteLine($"{options.Player} {query.Question}");
+            Console.WriteLine(query.Holds(kdas) ? "Yes" : "No");
+        }
 
         private static void PrintOutliers(ModeReport report)
         {
