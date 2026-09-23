@@ -86,9 +86,12 @@ static void Main(string[] args)
     if (args.Length == 0 || args.Contains("--help"))
     {
         Console.WriteLine("Usage: EsportApp [--game valorant|cs2|lol] [--player <nom>]");
-        Console.WriteLine("                 [--filter wins|losses] [--stat kda|kills]");
+        Console.WriteLine("                 [--filter wins|losses|all] [--stat kda|kills|assists]");
+        Console.WriteLine("                 [--normalize] [--smooth <n>]");
+        Console.WriteLine("                 [--error strict|soft|hard] [--window <n>]");
         Console.WriteLine("                 [--rank] [--export <fichier>] [--audit]");
         Console.WriteLine("                 [--bracket <n>] [--generate <joueur|all>]");
+        Console.WriteLine("                 [--help] [--version]");
         return;
     }
     // Lire les flags manuellement — args.Contains() et Array.IndexOf()
@@ -97,6 +100,10 @@ static void Main(string[] args)
 
 Chaque exercice introduit un ou deux nouveaux flags. À la fin de la partie 8,
 l'application reconnaît une dizaine d'arguments construits progressivement.
+
+Le texte affiché par `--help` grandit donc d'exercice en exercice : chaque fois qu'un flag
+est ajouté, il est aussi documenté dans l'aide. C'est la règle du fil rouge — un flag qui
+n'apparaît pas dans `--help` n'existe pas.
 
 ---
 

@@ -139,7 +139,8 @@ n’est pas forcément inclus dans la liste. Au maximum elles contiennent 3 argu
 
 #### Avec seed,fonction et transformation (1,2,3)
 ``` csharp
-int sum = numbers.Aggregate(/*seed*/0,/**/(a,b)=>a+b,/*transformation*/number=>$"Somme:{number}");
+string sum = numbers.Aggregate(/*seed*/0,/**/(a,b)=>a+b,/*transformation*/number=>$"Somme:{number}");
+// ^ !! type string à cause du typre retourné par la lambda en 3ème argument !!
 ```
 
 #### Juste avec seed et fonction (1,2)

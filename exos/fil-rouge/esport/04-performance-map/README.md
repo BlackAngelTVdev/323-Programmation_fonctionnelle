@@ -1,6 +1,6 @@
 # Exercice 04 — Calculer le KDA par joueur
 
-> Partie 3 — `.Transform()` + `.Normalize()` + `.Smooth()`
+> Partie 3 — `.Transform()` + `Normalize()` + `Smooth()` (hors `DataSeries<T>`, temporaire)
 
 ## Concepts théoriques
 
@@ -33,9 +33,9 @@ La source n'est jamais modifiée.
 
 ## 4.1 — Calculer les KDA (ou tout autre indicateur) `.Transform(mapper)`
 
-Nous voulons que notre librairie `DataSeries` offre la possibilité d'appliquer une transformation à tous les éléments d'une série, tout en conservant leurs timestamps.
-Nous tenons au fait que la librairie reste générale (générique!) pour pouvoir être utilisée dans des domaines d'application différents les uns des autres.
-Nous devons donc être capable de faire la transformation de ... n'importe quoi en ... n'importe quoi !
+Nous voulons que notre librairie `DataSeries` offre la possibilité d'appliquer une transformation à tous les éléments d'une série.  
+Nous tenons au fait que la librairie reste générale (générique!) pour pouvoir être utilisée dans des domaines d'application différents les uns des autres.  
+Nous devons donc être capable de faire la transformation de ... n'importe quoi en ... n'importe quoi !  
 C'est mission impossible! Sauf si on nous fournit l'outil (la fonction) qui sait faire cette transformation.
 
 **Avant de coder :**
@@ -131,6 +131,21 @@ var kdaNoeNorm     = kdaNoe.Normalize(...);
 // Toutes les valeurs sont maintenant dans [0, 1]
 ```
 
+Exposer la normalisation avec un flag `--normalize`. Contrairement à `--stat`, il n'attend
+aucune valeur : sa seule présence suffit — c'est un interrupteur, pas un réglage.
+
+```csharp
+bool normalize = args.Contains("--normalize");
+
+// Normalize évalue ET ramène dans [0, 1] : inutile d'enchaîner Transform et Normalize
+DataSeries<double> valeurs = normalize
+    ? retenus.Normalize(selecteur)
+    : retenus.Transform(selecteur);
+```
+
+> Vérification immédiate : avec `--normalize`, la plus petite valeur affichée vaut
+> exactement `0.00` et la plus grande `1.00`. Toujours vrai, quel que soit le `--stat`.
+
 ---
 
 ## 4.3 — Lisser une courbe avec `.Smooth(windowSize)` et la closure
@@ -169,7 +184,7 @@ Observer la closure :
 
 ```csharp
 int window = 3;
-var smoothed = kdaLea.Smooth(window);
+var smoothed = MathHelpers.Smooth(kdaLea, window);
 window = 10; // Sans effet — window a été copiée à l'appel de Smooth (passage d'argument)
 ```
 
@@ -179,11 +194,44 @@ window = 10; // Sans effet — window a été copiée à l'appel de Smooth (pass
 > lambda capture, et il ne change plus.
 > → [Closures](../../../../supports/source/02a-fonctions-sup.md#closures-captures-de-variables)
 
+Exposer le lissage avec un flag `--smooth <n>`, qui lui attend une valeur — et qui peut se
+combiner à `--normalize` (on normalise d'abord, on lisse ensuite) :
+
+```csharp
+int smoothWindow = 0;
+if (args.Contains("--smooth") && !int.TryParse(args[Array.IndexOf(args, "--smooth") + 1], out smoothWindow))
+    smoothWindow = -1;          // valeur non numérique → message d'erreur, pas d'exception
+
+if (smoothWindow > 0)
+    valeurs = valeurs.Smooth(v => v, smoothWindow);   // série déjà numérique : évaluateur identité
+```
+
+**Avant d'afficher :** une série de n valeurs lissée sur une fenêtre de `w` en produit
+`n - w + 1`. Les dates, elles, sont toujours au nombre de n — à quelle date rattacher la
+première moyenne ?
+
+<details>
+<summary>Voir la convention retenue</summary>
+
+Une moyenne glissante est datée par le **dernier** match de sa fenêtre : les `w - 1` premiers
+matchs n'ouvrent aucune fenêtre complète. À l'affichage, il faut donc sauter ces `w - 1`
+premières dates, sinon chaque valeur est attribuée au mauvais match.
+
+C'est le genre de décalage silencieux qu'aucun compilateur ne signale : avec `--smooth 3`,
+la première valeur affichée doit porter la date du **3e** match.
+
+</details>
+
+> Ne pas confondre `--smooth <n>` avec `--window <n>`, qui arrive à l'exercice 05 :
+> `--smooth` lisse la courbe affichée (n valeurs → n - w + 1 valeurs), `--window` découpera
+> la série en segments pour en calculer des statistiques.
+
 ---
 
 ## 4.4 — Interface CLI
 
-Ajouter `--stat kda|kills|assists` pour choisir la transformation à afficher.
+Ajouter `--stat kda|kills|assists` pour choisir la transformation à afficher (défaut : `kda`),
+et le documenter dans `--help`.
 
 **Avant de coder :** Comment mapper une valeur de flag (`"kda"`, `"kills"`, `"assists"`) à une
 transformation différente ? Plutôt qu'une chaîne de `if/else` (ou même un `switch`),
@@ -227,6 +275,60 @@ une ligne dans la table, et l'appel à `Transform` ne change pas.
 
 ---
 
+## 4.5 — L'aide complète
+
+Quatre exercices, dix flags. `EsportApp --help` (ou un lancement sans aucun argument) doit
+maintenant afficher exactement ceci — et `EsportApp --version` doit répondre `EsportApp 0.4`.
+
+```text
+Usage: EsportApp [options]
+
+  Analyse des performances de Team Helvetia (Valorant, CS2, LoL).
+
+Sélection des données
+  --game   valorant|cs2|lol    Jeu à analyser              (défaut : les trois)
+  --player <nom>               Restreindre à un joueur     (défaut : tous)
+  --filter wins|losses|all     Issue des matchs retenus    (défaut : all)
+
+Analyse
+  --stat   kda|kills|assists   Indicateur calculé/affiché  (défaut : kda)
+  --normalize                  Ramène l'indicateur dans [0.0, 1.0]
+  --smooth <n>                 Moyenne glissante sur n valeurs
+                                 (normalisation puis lissage, dans cet ordre)
+
+Données
+  --generate <joueur|all>      Simule et exporte les matchs manquants, puis quitte
+  --error  strict|soft|hard    Traitement des valeurs aberrantes (défaut : soft)
+                                 strict : les affiche et s'arrête
+                                 soft   : les élimine et continue
+                                 hard   : les élimine, sauve le CSV nettoyé, continue
+
+Divers
+  --help                       Affiche cette aide
+  --version                    Affiche la version
+```
+
+Deux vérifications que l'aide n'est pas qu'un texte décoratif :
+
+- tout flag affiché doit fonctionner, et tout flag qui fonctionne doit être affiché ;
+- un flag inconnu (`--rank`, qui n'arrive qu'à l'exercice 05) ou une valeur inconnue
+  (`--stat headshots`, `--smooth abc`, `--smooth 0`) doit produire un message clair,
+  pas une exception non gérée ni un silence ;
+- `--smooth 1` doit afficher exactement la même chose que sans le flag : une fenêtre de 1
+  est l'identité. Si ce n'est pas le cas, l'implémentation de `Smooth` a un décalage d'indice.
+
+Exemples de pipelines complets à essayer :
+
+```bash
+EsportApp --game valorant --player Léa --filter wins --stat kda
+EsportApp --game lol --player Noé --stat assists
+EsportApp --game valorant --player Léa --stat kda --normalize --smooth 3
+EsportApp --generate all
+EsportApp --error strict
+```
+
+---
+
 ## Étape bonus (avancé) — SelectMany
 
 > Étape optionnelle — pour aller plus loin.
@@ -251,6 +353,10 @@ Console.WriteLine($"KDA de l'équipe entière : {allKda.Count()} valeurs");
 
 ## Vérification
 
+- `--help` et `--version` rendent la main sans rien charger
+- `--stat kills` et `--stat assists` changent les nombres affichés, pas le pipeline
+- `--normalize` : la plus petite valeur affichée vaut 0.00, la plus grande 1.00
+- `--smooth 3` sur les 13 matchs de Léa affiche 11 valeurs, la première datée du 3e match
 - `kdaLea.Count` = 13 (matchs de Léa uniquement)
 - Valeurs normalisées dans [0.0, 1.0] — min = 0.0, max = 1.0 exactement
 - `Smooth(1)` ne change rien (fenêtre = 1 = identité)

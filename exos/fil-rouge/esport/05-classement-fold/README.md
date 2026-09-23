@@ -1,11 +1,8 @@
 # Exercice 05 — Classement de saison
 
-> Partie 4 — `.Fold()` + `.Statistics()` + `.SlidingWindow()`
-
 ## Concepts théoriques
 
-- [Thématique 04 — Fold et agrégation](../../../../thematiques/04-fold-agregation.md)
-- [Fold — l'agrégation universelle](../../../../supports/source/04-Reduce.md#fold-—-l-agregation-universelle)
+- [Fold — l'agrégation universelle](../../../../supports/source/04-Reduce.md)
 - [GroupBy — agrégation par clé](../../../../supports/source/04-Reduce.md#groupby)
 
 ## Contexte
@@ -18,254 +15,229 @@ en une seule abstraction.
 
 ---
 
-## Concept FP : Fold — l'agrégation universelle
+## 5.1 — Extraire des indicateurs numériques
 
-`Sum`, `Count`, `Max`, `Any`, `All` sont tous des cas particuliers de `Fold`.
-Implémenter `Fold` une seule fois suffit à exprimer n'importe quelle agrégation.
+Ajouter des capacités à notre application qui permettent d'obtenir des valeurs spécifiques à partir à partir des stats de nos joueurs.
+
+Le programme doit proposer dans son help:
+
+`--extract min|max|avg|mme`
+
+... et naturellement répondre à ces demandes.  
+<details>
+<summary>Exemples d'utilisation</summary>
 
 ```
-[a, b, c, d] avec seed s et f :
-s → f(s, a) → f(f(s,a), b) → f(f(f(s,a),b), c) → résultat final
+EsportApp --game cs2 --player Raphaël --e
+                                           
+CS2 : 25 matchs, 0 écarté(s), 13 retenu(s) 
+  2024-01-05  Raphaël   kills = 24.00      
+  2024-01-10  Raphaël   kills = 19.00      
+  2024-01-14  Raphaël   kills = 22.00      
+  2024-01-19  Raphaël   kills = 17.00      
+  2024-01-24  Raphaël   kills = 25.00      
+  2024-01-29  Raphaël   kills = 16.00      
+  2024-02-03  Raphaël   kills = 23.00      
+  2024-02-07  Raphaël   kills = 18.00      
+  2024-02-12  Raphaël   kills = 22.00      
+  2024-02-17  Raphaël   kills = 14.00      
+  2024-02-22  Raphaël   kills = 24.00      
+  2024-02-27  Raphaël   kills = 20.00      
+  2024-03-04  Raphaël   kills = 21.00      
+  Min (kills) : 14.00                      
 ```
+                                           
+```
+EsportApp --game cs2 --player Kiara --ext
+                                           
+CS2 : 25 matchs, 0 écarté(s), 12 retenu(s) 
+  2024-01-06  Kiara     kills = 18.00      
+  2024-01-11  Kiara     kills = 21.00      
+  2024-01-15  Kiara     kills = 15.00      
+  2024-01-20  Kiara     kills = 23.00      
+  2024-01-25  Kiara     kills = 22.00      
+  2024-01-30  Kiara     kills = 24.00      
+  2024-02-04  Kiara     kills = 19.00      
+  2024-02-08  Kiara     kills = 26.00      
+  2024-02-13  Kiara     kills = 16.00      
+  2024-02-18  Kiara     kills = 22.00      
+  2024-02-23  Kiara     kills = 23.00      
+  2024-02-28  Kiara     kills = 25.00      
+  Max (kills) : 26.00                      
+```
+                                           
+```
+EsportApp --game lol --extract avg --stat
+                                           
+LoL : 25 matchs, 0 écarté(s), 25 retenu(s) 
+  2024-01-07  Noé       assists = 18.00    
+  2024-01-12  Noé       assists = 15.00    
+  2024-01-16  Noé       assists = 20.00    
+  2024-01-21  Noé       assists = 22.00    
+  2024-01-26  Noé       assists = 17.00    
+  2024-01-31  Noé       assists = 19.00    
+  2024-02-05  Noé       assists = 14.00    
+  2024-02-09  Noé       assists = 21.00    
+  2024-02-13  Noé       assists = 16.00    
+  2024-02-16  Noé       assists = 23.00    
+  2024-02-20  Noé       assists = 18.00    
+  2024-02-24  Noé       assists = 20.00    
+  2024-02-28  Noé       assists = 15.00    
+  2024-03-03  Noé       assists = 24.00    
+  2024-03-07  Noé       assists = 17.00    
+  2024-03-11  Noé       assists = 22.00    
+  2024-03-15  Noé       assists = 19.00    
+  2024-03-19  Noé       assists = 25.00    
+  2024-03-23  Noé       assists = 16.00    
+  2024-03-27  Noé       assists = 21.00    
+  2024-04-01  Noé       assists = 18.00    
+  2024-04-06  Noé       assists = 20.00    
+  2024-04-11  Noé       assists = 23.00    
+  2024-04-16  Noé       assists = 15.00    
+  2024-04-21  Noé       assists = 22.00    
+  Moyenne (assists) : 19.20                
+```
+                                           
+</details>
 
-→ Théorie : [Reduce / Aggregate](../../../../supports/source/04-Reduce.md) ·
-[Fold — l'agrégation universelle](../../../../supports/source/04-Reduce.md#fold-—-l-agregation-universelle)
+Ces indicateurs sont bien utiles, mais le staff de coaching de Team Helvetia est décidément très pointu et exigeant.  
+Il demande un indicateur particulier: la MME, qui signifie "Moyenne Mobile Exponentielle".  
 
----
+<details>
+<summary>Pour tout savoir sur la MME</summary>
+c'est [ici](https://fr.wikipedia.org/wiki/Moyenne_mobile#Moyenne_mobile_exponentielle).  
+</details>
 
-## Étape 1 — Implémenter `.Fold<TResult>()`
+Ici, il vous suffit de savoir deux choses:
+- La MME donne plus de poids dans une moyenne aux dernières valeurs de la série et c'est pour ça qu'elle intéresse Team Helvetia: elle permet de dire qui est le joueur en forme du moment.
+- Team Helvetia calcule cette moyenne comme ça: la MME de la série est égale à la moyenne arithmétique de
+  - La dernière valeur de la série
+  - La MME de toutes les valeurs précédentes.
 
-**Avant de coder :** quelle méthode LINQ fait exactement ce que décrit le schéma ci-dessus —
-accumuler une valeur en appliquant une fonction à chaque élément ?
+**Avant de coder :** comment appliquer `Aggregate` dans ce cas de figure ?
 
 <details>
 <summary>Indice</summary>
 
-`Aggregate(seed, combiner)` — c'est le Fold de LINQ.
-La méthode de la bibliothèque n'a qu'à déléguer à `Aggregate`.
+| Indice | Valeur |  MME  | `Sum` | `Average` |
+| :----: | :----: | :---: | :---: | :-------: |
+|   1    |   10   |  10   |  10   |    10     |
+|   2    |   12   |  11   |  22   |    11     |
+|   3    |   23   |  17   |  45   |    15     |
+|   4    |   55   |  36   |  100  |    25     |
+|   5    |   20   |  28   |  120  |    20     |
+|   6    |   30   |  29   |  150  |    25     |
+|   7    |   53   |  41   |  203  |    29     |
+|   8    |   37   |  39   |  240  |    30     |
 
 </details>
 
+Implémenter le calcul de la MME avec `Aggregate` dans la librairie `DataSerie`
+
 ```csharp
-public TResult Fold<TResult>(TResult seed, Func<TResult, T, TResult> combiner)
+public double MME(Func<T, double> value)
 {
-    // ...
+    // ... à vous de jouer
 }
 ```
+
+L'utiliser dans ESportApp avec `--extract mme`
 
 <details>
-<summary>Voir la solution</summary>
+<summary>Exemples d'utilisation</summary>
 
-```csharp
-public TResult Fold<TResult>(TResult seed, Func<TResult, T, TResult> combiner)
-    => _data.Aggregate(seed, combiner);
+```
+EsportApp --game cs2 --player Kiara --extract mme --stat kills 
+                                                         
+CS2 : 25 matchs, 0 écarté(s), 12 retenu(s)               
+  2024-01-06  Kiara     kills = 18.00                    
+  2024-01-11  Kiara     kills = 21.00                    
+  2024-01-15  Kiara     kills = 15.00                    
+  2024-01-20  Kiara     kills = 23.00                    
+  2024-01-25  Kiara     kills = 22.00                    
+  2024-01-30  Kiara     kills = 24.00                    
+  2024-02-04  Kiara     kills = 19.00                    
+  2024-02-08  Kiara     kills = 26.00                    
+  2024-02-13  Kiara     kills = 16.00                    
+  2024-02-18  Kiara     kills = 22.00                    
+  2024-02-23  Kiara     kills = 23.00                    
+  2024-02-28  Kiara     kills = 25.00                    
+  MME (kills) - forme du moment : 23.46                  
 ```
 
+```
+EsportApp --game cs2 --player Raphaël --mme
+
+CS2 : 25 matchs, 0 écarté(s), 13 retenu(s)
+  2024-01-05  Raphaël   kda = 3.00
+  2024-01-10  Raphaël   kda = 2.09
+  2024-01-14  Raphaël   kda = 3.00
+  2024-01-19  Raphaël   kda = 1.90
+  2024-01-24  Raphaël   kda = 3.62
+  2024-01-29  Raphaël   kda = 1.58
+  2024-02-03  Raphaël   kda = 3.50
+  2024-02-07  Raphaël   kda = 2.00
+  2024-02-12  Raphaël   kda = 3.12
+  2024-02-17  Raphaël   kda = 1.38
+  2024-02-22  Raphaël   kda = 3.50
+  2024-02-27  Raphaël   kda = 2.50
+  2024-03-04  Raphaël   kda = 2.67
+  MME (kda) - forme du moment : 2.66
+```
 </details>
 
-Réécrire les agrégations classiques avec `Fold` sur les KDA de Léa :
+## 5.2 - Défaillances et Surpuissances
 
-```csharp
-var kdaValues = kdaLea; // DataSeries<double>
+ESportApp doit permettre de répondre aux questions que se pose le staff de coaching:
+- "Ma joueuse a-t-elle eu des moments d'invincibilité ?"
+- "Mon joueur a-t-il eu des défaillances graves ?"
 
-var sum   = kdaValues.Fold(0.0, (acc, val) => acc + val);
-var count = kdaValues.Fold(0,   (acc, _)   => acc + 1);
-var best  = kdaValues.Fold(double.MinValue, (acc, val) => val > acc ? val : acc);
+Pour cela, ils veulent interroger les statistiques avec:  
+`ESportApp --player Noé --hasCrushed value`  
+`ESportApp --player Dylan --hasBeenCrushed value`  
+`ESportApp --player Kiara --hasBeenGod value`  
 
-var mean = sum / count;
-Console.WriteLine($"KDA moyen de Léa : {mean:F2}");
-Console.WriteLine($"KDA max de Léa   : {best:F2}");
-```
+L'app répond par `Yes` ou `No`  
 
-Reproduire pour les 4 autres joueurs et afficher le classement.
+Pour implémenter cette fonctionnalité, basez-vous sur le KDA:
 
----
+- `hasCrushed` = yes si le joueur a eu au moins un KDA supérieur à `value` dans les parties sélectionnées
+- `hasBeenCrushed` = yes si le joueur a eu au moins un KDA inférieur à `value` dans les parties sélectionnées
+- `hasBeenGod` = yes si le joueur a eu tous ses KDA supérieurs à `value` dans les parties sélectionnées
 
-## Étape 2 — `.SlidingWindow(size)` — progression mensuelle
+N'oubliez pas la cheatsheet (`Any`, `All`)
 
-**Avant de coder :** une fenêtre glissante de taille 5 à partir d'une liste de 13 éléments
-produit combien de fenêtres ? Quelle formule générale ?
+Attention: les options `--has*` ne peuvent fonctionner qu'avec une sélection de joueur `--player`
+
+## 5.3 — Progression mensuelle
+
+Le staff veut voir la progression - ou non - dans le temps d'un joueur.
+
+Pour cette fonctionnalité, les sélecteurs de joueur `--player` et de jeu `--game` sont requis.
+
+L'objectif est d'avoir le KDA moyen du joueur par mois.
 
 <details>
-<summary>Indice</summary>
+<summary>Exemples d'utilisation</summary>
 
-`count - size + 1` fenêtres. Pour 13 éléments avec taille 5 : `13 - 5 + 1 = 9` fenêtres.
+```
+EsportApp --player Noé --game lol --progress  
 
+2024-01     4.20                                
+2024-02     4.40                                
+2024-03     5.35                                
+2024-04     4.25                                
+```
 </details>
 
-```csharp
-public IEnumerable<DataSeries<T>> SlidingWindow(int size)
-{
-    var values = _data.ToList();
-    return Enumerable.Range(0, Math.Max(0, values.Count - size + 1))
-        .Select(i => // extraire une fenêtre de `size` éléments à partir de l'indice i
-        );
-}
-```
+Construire le pipeline a quatre temps :
 
-<details>
-<summary>Voir la solution</summary>
+1. **Obtenir la liste pertinente de `(timestamp, kda)`** — ne garder que les matchs du joueur et du jeu demandés, puis réduire chaque match à ce qui compte ici : quand il a été joué, et le KDA qu'il a produit. Tout le reste (agent, map, champion, MVPs...) ne sert plus à rien pour la suite.
+2. **Transformer en `(date, kda)`** — un timestamp est trop précis pour regrouper : deux matchs du même mois ont deux timestamps différents et formeraient deux groupes. Ramener le timestamp au mois (`yyyy-MM`) : c'est lui, la clé de regroupement.
+3. **Grouper par date** — `GroupBy` sur cette clé. Attention : `GroupBy` ne réduit rien, il réorganise. À ce stade, on n'a pas encore de moyennes mais une liste de groupes, chacun contenant tous les KDA d'un même mois.
+4. **Réduire au sein de chaque groupe** — chaque groupe est une série de nombres, donc la moyenne de ses KDA donne la valeur du mois. C'est un `Fold` par clé : le motif est `GroupBy(clé).Select(g => g.Aggregate(...))`.
 
-```csharp
-public IEnumerable<DataSeries<T>> SlidingWindow(int size)
-{
-    var values = _data.ToList();
-    return Enumerable.Range(0, Math.Max(0, values.Count - size + 1))
-        .Select(i => DataSeries<T>.From(values.Skip(i).Take(size)));
-}
-```
+Reste à afficher les mois dans l'ordre — un groupe ne sort pas forcément trié.
 
-</details>
-
-Calculer la moyenne KDA par fenêtre de 5 matchs pour Léa :
-
-```csharp
-var progression = kdaLea
-    .SlidingWindow(5)
-    .Select(window => window.Fold(0.0, (acc, v) => acc + v) / 5);
-
-Console.WriteLine("Progression KDA Léa (fenêtres de 5 matchs) :");
-foreach (var avg in progression)
-    Console.WriteLine($"  {avg:F2}");
-```
-
----
-
-## Étape 3 — `.Statistics()` — qui est le plus régulier ?
-
-```csharp
-public class SeriesStats
-{
-    public double Min { get; }
-    public double Max { get; }
-    public double Mean { get; }
-    public double StdDev { get; }
-
-    public SeriesStats(double min, double max, double mean, double stdDev)
-    {
-        Min = min;
-        Max = max;
-        Mean = mean;
-        StdDev = stdDev;
-    }
-}
-
-public SeriesStats Statistics()
-{
-    var values   = _data.Cast<double>().ToList();
-    var mean     = // ...
-    var variance = // ...
-    return new SeriesStats(min: /* ... */, max: /* ... */, mean: mean, stdDev: /* ... */);
-}
-```
-
-<details>
-<summary>Voir la solution</summary>
-
-```csharp
-public SeriesStats Statistics()
-{
-    var values   = _data.Cast<double>().ToList();
-    var mean     = values.Aggregate(0.0, (acc, v) => acc + v) / values.Count;
-    var variance = values.Aggregate(0.0, (acc, v) => acc + Math.Pow(v - mean, 2)) / values.Count;
-    return new SeriesStats(
-        min:    values.Min(),
-        max:    values.Max(),
-        mean:   mean,
-        stdDev: Math.Sqrt(variance)
-    );
-}
-```
-
-</details>
-
-Comparer les profils — un écart-type faible = joueur régulier :
-
-```csharp
-var statsLea     = kdaLea.Statistics();
-var statsRaphael = kdaRaphael.Statistics();
-Console.WriteLine($"Léa     — KDA moy : {statsLea.Mean:F2}, écart-type : {statsLea.StdDev:F2}");
-Console.WriteLine($"Raphaël — KDA moy : {statsRaphael.Mean:F2}, écart-type : {statsRaphael.StdDev:F2}");
-```
-
-Qui mérite la place de titulaire aux playoffs ?
-
----
-
-## Étape 4 — Interface CLI
-
-Ajouter `--rank` pour afficher le classement des joueurs par KDA moyen,
-et `--window <n>` pour afficher la progression sur des fenêtres glissantes.
-
-**Avant de coder :** Comment trier une collection de tuples `(nom, kdaMoyen)` par valeur décroissante ?
-Pour `--window`, comment récupérer `n` sous forme d'entier depuis `args` ?
-
-```
-dotnet run -- --rank
-dotnet run -- --game valorant --player Léa --stat kda --window 3
-```
-
-<details>
-<summary>Voir la solution</summary>
-
-```csharp
-if (args.Contains("--rank"))
-{
-    var players = new[]
-    {
-        ("Léa",     kdaLea.Fold(0.0,     (a, v) => a + v) / kdaLea.Count),
-        ("Raphaël", kdaRaphael.Fold(0.0, (a, v) => a + v) / kdaRaphael.Count),
-        ("Noé",     kdaNoe.Fold(0.0,     (a, v) => a + v) / kdaNoe.Count),
-        ("Dylan",   kdaDylan.Fold(0.0,   (a, v) => a + v) / kdaDylan.Count),
-        ("Kiara",   kdaKiara.Fold(0.0,   (a, v) => a + v) / kdaKiara.Count),
-    };
-    foreach (var (name, kda) in players.OrderByDescending(p => p.Item2))
-        Console.WriteLine($"{name,-10} KDA moy : {kda:F2}");
-}
-
-int window = args.Contains("--window")
-    ? int.Parse(args[Array.IndexOf(args, "--window") + 1])
-    : 5;
-```
-
-</details>
-
----
-
-## Étape bonus (avancé) — GroupBy
-
-> Étape optionnelle — pour aller plus loin.
-
-Le classement de l'étape 4 construit les moyennes joueur par joueur, à la main.
-`GroupBy` fait le partitionnement automatiquement : les stats **par joueur** en un seul pipeline.
-
-```csharp
-// Tous les matchs Valorant (Léa + Dylan) — stats par joueur en un pipeline
-var ranking = valorant.Values
-    .GroupBy(m => m.Player)
-    .Select(g => new
-    {
-        Player  = g.Key,
-        Matches = g.Count(),
-        AvgKda  = g.Aggregate(0.0, (acc, m) =>
-                      acc + (m.Kills + m.Assists) / (double)(m.Deaths == 0 ? 1 : m.Deaths))
-                  / g.Count()
-    })
-    .OrderByDescending(s => s.AvgKda);
-
-foreach (var s in ranking)
-    Console.WriteLine($"{s.Player,-10} {s.Matches} matchs — KDA moy : {s.AvgKda:F2}");
-```
-
-Le motif `GroupBy(clé).Select(g => g.Aggregate(...))` = partitionner, puis réduire chaque
-partition — un `Fold` par clé.
 → [GroupBy — agréger par clé](../../../../supports/source/04-Reduce.md#groupby)
 
----
-
-## Vérification
-
-- `Fold` sur liste vide retourne `seed`
-- `SlidingWindow(5)` sur 13 matchs produit 9 fenêtres (13 - 5 + 1 = 9)
-- `Statistics().Mean` correspond à `Fold(0.0, (acc,v)=>acc+v) / Count`
-- Les écarts-types permettent de distinguer les profils réguliers des profils variables

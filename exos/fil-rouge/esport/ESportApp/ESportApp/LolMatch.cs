@@ -8,8 +8,9 @@ namespace ESportApp
 {
     public class LolMatch
     {
-        public LolMatch(string player, string champion, int kills, int deaths, int assists, int cs, int visionScore, bool won)
+        public LolMatch(DateTime date, string player, string champion, int kills, int deaths, int assists, int cs, int visionScore, bool won)
         {
+            Date = date;
             Player = player;
             Champion = champion;
             Kills = kills;
@@ -20,6 +21,7 @@ namespace ESportApp
             Won = won;
         }
 
+        public DateTime Date { get; }
         public string Player { get; }
         public string Champion { get; }
         public int Kills { get; }
@@ -31,7 +33,7 @@ namespace ESportApp
 
         public override string ToString()
         {
-            return $"Player: {Player}, Champion: {Champion}, Kills: {Kills}, Deaths: {Deaths}, Assists: {Assists}, CS: {Cs}, Vision Score: {VisionScore}, Won: {Won}";
+            return $"Date: {Date:yyyy-MM-dd}, Player: {Player}, Champion: {Champion}, Kills: {Kills}, Deaths: {Deaths}, Assists: {Assists}, CS: {Cs}, Vision Score: {VisionScore}, Won: {Won}";
         }
     }
 }

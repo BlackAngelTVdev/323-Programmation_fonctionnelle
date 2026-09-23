@@ -14,7 +14,7 @@ Team Helvetia se qualifie pour les playoffs. Le bracket de tournoi fonctionne
 par élimination directe — on divise les équipes en deux moitiés, chaque moitié joue
 ses matchs, et on combine les résultats. C'est exactement la structure d'une récursion.
 
-`Decompose` divise récursivement une série en sous-séries — utile pour l'analyse
+`Decompose` divise récursivement une `StatSeries` en sous-séries — utile pour l'analyse
 multi-échelle : voir les tendances à court terme (5 matchs) et long terme (toute la saison).
 
 ---
@@ -33,9 +33,9 @@ Que se passerait-il sans le cas de base ?
 ## Étape 1 — Implémenter `.Decompose(minSize)`
 
 ```csharp
-public IEnumerable<DataSeries<T>> Decompose(int minSize)
+public IEnumerable<StatSeries> Decompose(int minSize)
 {
-    var values = _data.ToList();
+    var points = _data.ToList();
 
     if (/* cas de base */)
         return // ...
@@ -52,20 +52,23 @@ public IEnumerable<DataSeries<T>> Decompose(int minSize)
 <summary>Voir la solution</summary>
 
 ```csharp
-public IEnumerable<DataSeries<T>> Decompose(int minSize)
+public IEnumerable<StatSeries> Decompose(int minSize)
 {
-    var values = _data.ToList();
+    var points = _data.ToList();
 
-    if (values.Count <= minSize)
+    if (points.Count <= minSize)
         return new[] { this };
 
-    int mid   = values.Count / 2;
-    var left  = DataSeries<T>.From(values.Take(mid));
-    var right = DataSeries<T>.From(values.Skip(mid));
+    int mid   = points.Count / 2;
+    var left  = new StatSeries(points.Take(mid));
+    var right = new StatSeries(points.Skip(mid));
 
     return left.Decompose(minSize).Concat(right.Decompose(minSize));
 }
 ```
+
+> **Remarque :** `new StatSeries(...)` appelle le constructeur privé depuis une méthode
+> d'instance — c'est autorisé car on est dans la même classe.
 
 </details>
 
@@ -83,11 +86,11 @@ Prédire le résultat pour 8 éléments avec `minSize = 2` :
 <summary>Voir l'arbre</summary>
 
 ```
-[M1 M2 M3 M4 M5 M6 M7 M8]
+[K1 K2 K3 K4 K5 K6 K7 K8]   (8 valeurs KDA)
          ↓ Decompose(2)
-   [M1 M2 M3 M4]      [M5 M6 M7 M8]
+   [K1 K2 K3 K4]      [K5 K6 K7 K8]
        ↓                    ↓
-  [M1 M2] [M3 M4]     [M5 M6] [M7 M8]
+  [K1 K2] [K3 K4]     [K5 K6] [K7 K8]
 ```
 
 4 sous-séries de 2 éléments.
@@ -95,7 +98,7 @@ Prédire le résultat pour 8 éléments avec `minSize = 2` :
 </details>
 
 ```csharp
-var series8   = DataSeries<double>.From(kdaLea.DataPoints.Take(8));
+var series8   = StatSeries.From(kdaLea.DataPoints.Take(8));
 var subSeries = series8.Decompose(minSize: 2);
 
 Console.WriteLine(subSeries.Count()); // 4
@@ -110,16 +113,16 @@ foreach (var s in subSeries)
 ## Étape 3 — Bracket de tournoi simplifié
 
 ```csharp
-var series = DataSeries<double>.From(kdaLea.Smooth(1).DataPoints.Take(8));
+var series = StatSeries.From(kdaLea.Smooth(1).DataPoints.Take(8));
 
-// Ronde 1 : 4 fenêtres de 2 matchs
+// Ronde 1 : 4 segments de 2 matchs — KDA moyen par paire
 var round1 = series.Decompose(2).Select(s => s.Statistics().Mean).ToList();
 Console.WriteLine("Ronde 1 (KDA moyen par paire) :");
 round1.ForEach(m => Console.WriteLine($"  {m:F2}"));
 
-// Ronde 2 : les moyennes de ronde 1 sont des valeurs synthétiques — timestamps arbitraires
-var round2 = DataSeries<double>.From(
-    round1.Select((v, i) => new DataPoint<double>(new DateTime(2024, 1, i + 1), v))
+// Ronde 2 : les moyennes de ronde 1 sont des valeurs synthétiques
+var round2 = StatSeries.From(
+    round1.Select((v, i) => (new DateTime(2024, 1, i + 1), v))
 ).Decompose(1).Select(s => s.Statistics().Mean);
 Console.WriteLine("Ronde 2 (KDA moyen par quart) :");
 foreach (var m in round2) Console.WriteLine($"  {m:F2}");
@@ -164,9 +167,8 @@ if (args.Contains("--bracket"))
 Récapitulatif de tous les flags reconnus :
 
 ```
---help  --version  --game  --player  --filter  --stat  --error
---normalize  --smooth  --window  --rank  --export  --audit
---generate  --bracket
+--help  --game  --player  --filter  --stat  --window
+--rank  --export  --audit  --generate  --bracket
 ```
 
 ---
