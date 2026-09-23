@@ -26,6 +26,13 @@ if (args.Contains("--generate"))
 // 3.3 — CLI : --player <nom> --filter wins|losses|all --error [strict|soft|hard]
 if (args.Any(arg => arg.StartsWith("--")))
 {
+    // Aide demandée, avec ou sans autres flags.
+    if (args.Contains("--help") || args.Contains("-h"))
+    {
+        CommandLine.ShowHelp();
+        return;
+    }
+
     CommandLine.Run(args);
     return;
 }

@@ -87,6 +87,33 @@ namespace DataLib
                 (e.Timestamp, range == 0 ? 0.0 : (e.Value - min) / range)));
         }
 
+        // Moyenne Mobile Exponentielle : donne plus de poids aux dernières
+        // valeurs de la série — elle dit qui est « en forme du moment ».
+        // Convention Team Helvetia : la MME de la série = moyenne arithmétique de
+        // la dernière valeur et de la MME de toutes les valeurs précédentes :
+        //     MME(1) = v1
+        //     MME(n) = (MME(n-1) + vn) / 2
+        // C'est une récursion terminale : l'état à transporter est la MME courante
+        // et le nombre d'éléments vus (pour reconnaître le premier). Aggregate
+        // encapsule exactement ce genre de réduction, donc un seul passage suffit.
+        public double MME(Func<T, double> value)
+        {
+            (double mme, int n) = _data.Aggregate(
+                (Mme: double.NaN, Count: 0),
+                (state, item) =>
+                {
+                    double v = value(item);
+                    int n = state.Count + 1;
+                    // Premier élément : MME = v ; sinon : moyenne de l'ancienne MME et de v.
+                    return (double.IsNaN(state.Mme) ? v : (state.Mme + v) / 2, n);
+                });
+
+            if (n == 0)
+                throw new InvalidOperationException(
+                    "MME : la série est vide, aucun indicateur calculable.");
+            return mme;
+        }
+
         // Moyenne glissante : la valeur d'indice i est la moyenne des éléments
         // d'indices [i - windowSize + 1 .. i], donc des windowSize derniers éléments.
         // Les windowSize - 1 premiers indices n'ont pas de fenêtre complète : on les
