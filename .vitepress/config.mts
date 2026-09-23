@@ -117,6 +117,7 @@ export default defineConfig({
   description: "Module ICT 323 sur la programmation fonctionnelle",
 
   markdown: {
+    math: true,
     config: (md) => {
       filRougeLinksPlugin(md)
       exoLinksPlugin(md)

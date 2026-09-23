@@ -22,17 +22,12 @@ Un pipeline fluent lisible comme du langage naturel est l'objectif :
 kdaLea
     .Smooth(windowSize: 3)
     .WithFallback(0.0, v => double.IsNaN(v))
-    .PairWith(kdaDylan)
     .ToCsv("report.csv");
 ```
 
 **Avant de coder :**
 
-- `Normalize()`, `Smooth()` (exercice 04) et `Statistics()` (exercice 05) étaient des fonctions
-  `static` isolées dans un utilitaire provisoire `MathHelpers`, appelées explicitement
-  (`MathHelpers.Normalize(series)`) faute de mécanisme pour les rattacher à `DataSeries<double>`.
-  Quel mot-clé C# permet d'ajouter une méthode à un type existant sans modifier sa classe —
-  et pourquoi `DataSeries<T>` (générique) en a besoin plutôt que d'écrire des méthodes d'instance ?
+- Pourquoi des méthodes d'*extension* plutôt que des méthodes dans la classe `StatSeries` ?
 - Quel contrat chaque méthode doit-elle respecter pour que le chaînage reste possible ?
 
 <details>
@@ -46,19 +41,14 @@ Le contrat de la composition : chaque méthode retourne le même type qu'elle re
 
 ---
 
-## Étape 1 — `ToCsv()` dans `DataSeriesExtensions.cs`
+## Étape 1 — `ToCsv()` dans `StatSeriesExtensions.cs`
 
-Renommer le fichier provisoire de l'exercice 04 (`DataSeries/MathHelpers.cs`) en
-`DataSeries/DataSeriesExtensions.cs`, et sa classe `MathHelpers` en `DataSeriesExtensions`.
-Ajouter le mot-clé `this` devant le premier paramètre de `Normalize`, `Smooth` et `Statistics`
-(exercice 05) — elles deviennent enfin de vraies méthodes d'extension, appelables en
-`series.Normalize()`, `series.Smooth(windowSize)` et `series.Statistics()` plutôt que via
-`MathHelpers.Normalize(series)`. Ajouter `ToCsv` à côté, directement comme méthode d'extension :
+Créer `DataSeries/StatSeriesExtensions.cs` :
 
 ```csharp
-public static class DataSeriesExtensions
+public static class StatSeriesExtensions
 {
-    public static void ToCsv(this DataSeries<double> series, string path)
+    public static void ToCsv(this StatSeries series, string path)
     {
         // générer les lignes "date,valeur" depuis DataPoints et écrire dans le fichier
         // ...
@@ -70,14 +60,15 @@ public static class DataSeriesExtensions
 <summary>Voir la solution</summary>
 
 ```csharp
-public static void ToCsv(this DataSeries<double> series, string path)
+public static void ToCsv(this StatSeries series, string path)
 {
-    var lines = series.DataPoints.Select(dp => $"{dp.Timestamp:yyyy-MM-dd},{dp.Value:F4}");
+    var lines = series.DataPoints.Select(d => $"{d.Date:yyyy-MM-dd},{d.Value:F4}");
     File.WriteAllLines(path, lines.Prepend("date,value"));
 }
 ```
 
 Chaque ligne porte la vraie date du match — le fichier est importable et triable dans Excel.
+Les dates viennent directement des tuples `(DateTime Date, double Value)` stockés dans `StatSeries`.
 
 </details>
 
@@ -85,11 +76,12 @@ Chaque ligne porte la vraie date du match — le fichier est importable et triab
 
 ## Étape 2 — `WithFallback(fallback, isMissing)`
 
-`WithFallback` n'est qu'un `Transform` conditionnel :
+`WithFallback` n'est qu'un filtre conditionnel : remplacer les valeurs manquantes (NaN, 0, etc.)
+par une valeur de remplacement.
 
 ```csharp
-public static DataSeries<T> WithFallback<T>(
-    this DataSeries<T> series, T fallback, Func<T, bool> isMissing)
+public static StatSeries WithFallback(
+    this StatSeries series, double fallback, Func<double, bool> isMissing)
 {
     // ...
 }
@@ -99,9 +91,11 @@ public static DataSeries<T> WithFallback<T>(
 <summary>Voir la solution</summary>
 
 ```csharp
-public static DataSeries<T> WithFallback<T>(
-    this DataSeries<T> series, T fallback, Func<T, bool> isMissing)
-    => series.Transform(v => isMissing(v) ? fallback : v);
+public static StatSeries WithFallback(
+    this StatSeries series, double fallback, Func<double, bool> isMissing)
+    => StatSeries.From(
+        series.DataPoints.Select(d => (d.Date, isMissing(d.Value) ? fallback : d.Value))
+    );
 ```
 
 </details>
@@ -115,8 +109,8 @@ traiter des séries corrélées (kills + assists, température + humidité...).
 → [Zip — combiner deux séquences en parallèle](../../../../supports/source/05-Extension.md#zip-—-combiner-deux-sequences-en-parallele)
 
 ```csharp
-public static DataSeries<(double Left, double Right)> PairWith(
-    this DataSeries<double> left, DataSeries<double> right)
+public static IEnumerable<(double Left, double Right)> PairWith(
+    this StatSeries left, StatSeries right)
 {
     // Hint : Zip combine deux séquences élément par élément
     // ...
@@ -127,26 +121,28 @@ public static DataSeries<(double Left, double Right)> PairWith(
 <summary>Voir la solution</summary>
 
 ```csharp
-public static DataSeries<(double Left, double Right)> PairWith(
-    this DataSeries<double> left, DataSeries<double> right)
-    => DataSeries<(double, double)>.From(
-        left.DataPoints.Zip(right.DataPoints, (l, r) =>
-            new DataPoint<(double, double)>(l.Timestamp, (l.Value, r.Value)))
-    );
+public static IEnumerable<(double Left, double Right)> PairWith(
+    this StatSeries left, StatSeries right)
+    => left.Values.Zip(right.Values, (l, r) => (l, r));
 ```
 
-Les timestamps de la série gauche sont préservés dans le résultat — le CSV exporté via `ToCsv` reste daté.
+`Zip` s'arrête à la séquence la plus courte — les séries de longueurs différentes sont acceptées.
+
+> **Différence avec esport :** `PairWith` dans le fil rouge esport retourne un
+> `DataSeries<(double Left, double Right)>` et préserve les timestamps.
+> Ici, retourner `IEnumerable<(double, double)>` suffit pour la comparaison côte à côte.
+> Le compromis : on perd les dates dans le résultat combiné.
 
 </details>
 
 Comparer kills normalisés et assists normalisés de Léa :
 
 ```csharp
-var kills   = valorant.Filter(m => m.Player == "Léa").Transform(m => (double)m.Kills);
-var assists = valorant.Filter(m => m.Player == "Léa").Transform(m => (double)m.Assists);
+var kills   = valorant.Filter(m => m.Player == "Léa").Extract(m => (double)m.Kills);
+var assists = valorant.Filter(m => m.Player == "Léa").Extract(m => (double)m.Assists);
 
 var report = kills.Normalize().PairWith(assists.Normalize());
-foreach (var (k, a) in report.Values)
+foreach (var (k, a) in report)
     Console.WriteLine($"kills={k:F2}  assists={a:F2}");
 ```
 
@@ -161,7 +157,7 @@ de connaître l'implémentation :
 ```csharp
 valorant
     .Filter(m => m.Player == "Léa")
-    .Transform(m => (double)m.Kills)
+    .Extract(m => (double)m.Kills)
     .Normalize()
     .Smooth(3)
     .WithFallback(0.0, v => double.IsNaN(v))
@@ -173,7 +169,7 @@ se répète pour chaque série du rapport — la stocker dans une variable :
 
 ```csharp
 // Préparation commune : lisser puis combler les trous
-Func<DataSeries<double>, DataSeries<double>> prepare =
+Func<StatSeries, StatSeries> prepare =
     s => s.Smooth(3).WithFallback(0.0, v => double.IsNaN(v));
 
 // Réutilisé sur chaque série du rapport hebdomadaire

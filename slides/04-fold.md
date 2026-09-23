@@ -201,10 +201,10 @@ bool anyEven = numbers.Aggregate(false,
 
 ---
 
-# Map est aussi un Fold
+# Faire du Map avec Aggregate
 
 ```csharp {1-5|7-8|all}
-// Select réécrit en Fold — pour comprendre la mécanique
+// Aggregate est si général qu'il peut imiter Select — illustration
 var doubled = numbers.Aggregate(
     new List<int>(),                              // seed : liste vide
     (acc, val) => { acc.Add(val * 2); return acc; }
@@ -217,8 +217,7 @@ var doubled2 = numbers.Select(n => n * 2).ToList(); // → [2, 4, 6, 8, 10]
 <v-click>
 <div class="mt-4 p-3 bg-orange-100 rounded text-orange-900">
 
-`Select` est un `Aggregate` qui accumule dans une nouvelle liste.
-Fold est l'opération primitive dont les autres sont dérivées.
+Ceci illustre la puissance d'`Aggregate`, pas une équivalence conceptuelle : Map transforme chaque élément (N → N), Fold réduit la collection (N → 1). Ici, l'accumulateur est une liste, mais le principe reste une réduction.
 
 </div>
 </v-click>
@@ -229,6 +228,44 @@ layout: section
 
 # Partie 4
 ## GroupBy — réduire par clé
+
+---
+
+# Outil requis : Dictionary&lt;TKey, TValue&gt;
+
+```csharp {1-4|6-11|all}
+// List<T> — séquence ordonnée, accès par position
+List<string> names = new() { "Alice", "Bob", "Claude" };
+names[0];              // → "Alice"  (accès par index)
+names.Contains("Bob"); // → true    (recherche par valeur, O(n))
+
+// Dictionary<TKey, TValue> — paires clé-valeur, accès par clé
+Dictionary<string, int> ages = new() {
+    ["Alice"] = 30, ["Bob"] = 25, ["Claude"] = 40
+};
+ages["Bob"];                           // → 25   (accès par clé, O(1))
+ages.ContainsKey("Bob");               // → true (recherche par clé, O(1))
+ages.TryGetValue("Zoé", out var age);  // → false, age = 0 (pas d'exception)
+```
+
+<v-click>
+
+| | `List<T>` | `Dictionary<TKey, TValue>` |
+|---|---|---|
+| Accès | par position (`int`) | par clé (`TKey`) |
+| Ordre | conservé | non garanti |
+| Recherche | O(n) (parcours) | O(1) (par clé) |
+| Unicité | doublons autorisés | clés uniques |
+
+</v-click>
+
+<v-click>
+<div class="mt-1 p-1 bg-blue-700 rounded text-blue-300">
+
+`List<T>` répond à « quel est l'élément à la position i ? ». `Dictionary<TKey, TValue>` répond à « quelle est la valeur associée à cette clé ? ». `GroupBy` va justement partitionner une collection par clé — le même besoin que `Dictionary`, mais sans mutation.
+
+</div>
+</v-click>
 
 ---
 
@@ -255,6 +292,37 @@ var avgAgeByGroup = people
     });
 // → { FamilySize=0, AvgAge=17.0 }, { FamilySize=1, AvgAge=18.0 }, ...
 ```
+
+---
+
+# GroupBy ↔ Dictionary
+
+```csharp {1-9|11-12|14-16|all}
+// Sans GroupBy : remplir un Dictionary à la main (impératif, mutable)
+var groupsManual = new Dictionary<int, List<Person>>();
+foreach (var p in people)
+{
+    int key = p.Sisters + p.Brothers;
+    if (!groupsManual.ContainsKey(key))
+        groupsManual[key] = new List<Person>();
+    groupsManual[key].Add(p);
+}
+
+// Avec GroupBy : même résultat, déclaratif — pas de boucle, pas de mutation
+var groups = people.GroupBy(p => p.Sisters + p.Brothers);
+
+// GroupBy produit des groupes, pas un Dictionary — ToDictionary fait le pont
+var groupsDict = groups.ToDictionary(g => g.Key, g => g.ToList());
+groupsDict[1]; // → [Germaine, Pierre, Sylvie] — accès direct par clé, O(1)
+```
+
+<v-click>
+<div class="mt-4 p-3 bg-blue-700 rounded text-blue-300">
+
+`Dictionary<TKey, TValue>` associe une **clé unique** à une **valeur**, avec accès en O(1). `GroupBy` fait le même partitionnement par clé — sans boucle ni `ContainsKey` — mais renvoie des `IGrouping<TKey, T>`, pas un `Dictionary`. `ToDictionary` convertit l'un en l'autre quand un accès direct par clé est nécessaire.
+
+</div>
+</v-click>
 
 ---
 

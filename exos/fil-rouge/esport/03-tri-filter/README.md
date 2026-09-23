@@ -89,9 +89,15 @@ Console.WriteLine(valorant.Count); // 24
 
 ## 3.3 — CLI pour définir le comportement face aux erreurs
 
-Ajouter les flags `--player <nom>` et `--filter wins|losses|all`.
+Ajouter les flags `--player <nom>` et `--filter wins|losses|all`, et les documenter dans `--help`.
 
-Ajouter un flag `--error [strict | soft | hard]` : en strict, on affiche les outliers et on s'arrête. En soft, on les élimine et on continue. En hard, on les élimine, on sauve le fichier et on continue.
+Ajouter un flag `--error strict|soft|hard` : en strict, on affiche les outliers et on s'arrête.
+En soft, on les élimine et on continue. En hard, on les élimine, on sauve la série nettoyée
+dans `<jeu>_clean.csv` (export de l'exercice 02) et on continue.
+
+Valeurs par défaut quand le flag est absent : `--filter all`, `--error soft`, et `--player`
+absent signifie « tous les joueurs ». Le programme doit donc tourner sans aucun argument de
+filtrage — les défauts sont le cas le plus courant, pas un cas d'erreur.
 
 **Avant de coder :** Si `--player` est absent, que filtrer ? Si `--filter` vaut `"all"`,
 faut-il appliquer un prédicat ? Plutôt qu'un if/else par mode, que gagne-t-on à stocker
@@ -119,6 +125,10 @@ string filterMode = args.Contains("--filter")
     ? args[Array.IndexOf(args, "--filter") + 1]
     : "all";
 
+string errorMode = args.Contains("--error")
+    ? args[Array.IndexOf(args, "--error") + 1]
+    : "soft";
+
 // Table de prédicats — le mode CLI sélectionne une fonction
 var filters = new Dictionary<string, Func<ValorantMatch, bool>>
 {
@@ -127,7 +137,24 @@ var filters = new Dictionary<string, Func<ValorantMatch, bool>>
     ["all"]    = m => true,
 };
 
-var result = valorant.Filter(filters[filterMode]);
+var result = valorant
+    .Filter(dp => player == null || dp.Value.Player == player)
+    .Filter(dp => filters[filterMode](dp.Value));
+```
+
+Les trois modes de `--error` se branchent sur `Outliers` et `Sanitize` :
+
+```csharp
+var aberrants = valorant.Outliers(estAberrant);
+
+if (errorMode == "strict" && aberrants.Count > 0)
+{
+    foreach (var dp in aberrants.Values) Console.WriteLine(dp);
+    return;                                  // on s'arrête
+}
+
+var propre = valorant.Sanitize(estAberrant); // soft et hard continuent
+if (errorMode == "hard") ExportValorant(propre, "valorant_clean.csv");
 ```
 
 Ajouter un critère = ajouter **une ligne dans la table, zéro if**. La fonction choisie
@@ -142,7 +169,9 @@ composabilité des flags = composabilité du pipeline.
 
 ## Vérification
 
+- `--error strict` sur des données saines ne change rien : il n'y a pas d'aberration à signaler.
+  Pour le tester, ajouter une ligne impossible (`kills = -5`) à la fin d'un CSV.
 - `valorant.Count` reste 25 après `Filter` (immuabilité)
 - `RemoveOutliers` sur les données réelles ne retire aucun match (données déjà propres)
 - `RemoveOutliers` sur les données générées (exercice 02) retire quelques matchs impossibles
-- L'observation de la paresse confirme que le prédicat n'est pas appelé avant matérialisation
+- Les deux expériences confirment que `DataSeries<T>` matérialise immédiatement (snapshot) — contrairement à un pipeline LINQ pur

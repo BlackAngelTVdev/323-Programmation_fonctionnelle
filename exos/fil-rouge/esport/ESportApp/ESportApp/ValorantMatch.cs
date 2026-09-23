@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataSeries
+namespace ESportApp
 {
     public class ValorantMatch
     {
+        public DateTime Date { get; }
         public string Player { get; }
         public string Agent { get; }
         public int Kills { get; }
@@ -17,9 +18,10 @@ namespace DataSeries
         public int RoundsWon { get; }
         public bool Won { get; }
 
-        public ValorantMatch(string player, string agent, int kills, int deaths,
+        public ValorantMatch(DateTime date, string player, string agent, int kills, int deaths,
                      int assists, int headshots, int roundsWon, bool won)
         {
+            Date = date;
             Player = player;
             Agent = agent;
             Kills = kills;
@@ -32,7 +34,7 @@ namespace DataSeries
 
         public override string ToString()
         {
-            return $"Player: {Player}, Agent: {Agent}, Kills: {Kills}, Deaths: {Deaths}, Assists: {Assists}, Headshots: {Headshots}, Rounds Won: {RoundsWon}, Won: {Won}";
+            return $"Date: {Date:yyyy-MM-dd}, Player: {Player}, Agent: {Agent}, Kills: {Kills}, Deaths: {Deaths}, Assists: {Assists}, Headshots: {Headshots}, Rounds Won: {RoundsWon}, Won: {Won}";
         }
     }
 }
